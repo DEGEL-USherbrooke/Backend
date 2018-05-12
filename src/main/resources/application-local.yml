@@ -1,0 +1,9 @@
+spring:
+  profiles: local
+  datasource:
+    url: jdbc:postgresql://localhost:5432/degel
+    username: degel
+    password: password
+
+app:
+  envName: local
