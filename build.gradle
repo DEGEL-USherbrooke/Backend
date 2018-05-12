@@ -42,10 +42,12 @@ repositories {
 
 dependencies {
 	//compile('org.springframework.boot:spring-boot-starter-data-jpa')
-	compile('org.springframework.boot:spring-boot-starter-web')
-	compile('com.fasterxml.jackson.module:jackson-module-kotlin')
-	compile("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
-	compile("org.jetbrains.kotlin:kotlin-reflect")
-	compile 'io.github.microutils:kotlin-logging:1.5.4'
-	testCompile('org.springframework.boot:spring-boot-starter-test')
+	compile "org.springframework.boot:spring-boot-starter-web:2.0.2.RELEASE"
+	compile "com.fasterxml.jackson.module:jackson-module-kotlin:2.9.5"
+	//compile "org.flywaydb:flyway-core:5.0.7"
+	compile "org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.2.20"
+	compile "org.jetbrains.kotlin:kotlin-reflect:1.2.20"
+	compile "io.github.microutils:kotlin-logging:1.5.4"
+
+	testCompile "org.springframework.boot:spring-boot-starter-test:2.0.2.RELEASE"
 }
