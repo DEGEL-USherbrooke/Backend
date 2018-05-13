@@ -1,7 +1,8 @@
 buildscript {
 	ext {
-		kotlinVersion = '1.2.20'
+		kotlinVersion = '1.2.41'
 		springBootVersion = '2.0.2.RELEASE'
+        swaggerVersion = '2.8.0'
 	}
 	repositories {
 		mavenCentral()
@@ -20,7 +21,7 @@ apply plugin: 'org.springframework.boot'
 apply plugin: 'io.spring.dependency-management'
 
 group = 'ca.usherbrooke'
-version = '0.0.1-SNAPSHOT'
+version = '0.0.1'
 sourceCompatibility = 1.8
 compileKotlin {
 	kotlinOptions {
@@ -42,18 +43,29 @@ repositories {
 
 dependencies {
 	// Web
-	compile "org.springframework.boot:spring-boot-starter-web:2.0.2.RELEASE"
+	compile "org.springframework.boot:spring-boot-starter-web:$springBootVersion"
 	compile "com.fasterxml.jackson.module:jackson-module-kotlin:2.9.5"
 
 	// Database
-	compile "org.springframework.boot:spring-boot-starter-data-jpa:2.0.2.RELEASE"
+	compile "org.springframework.boot:spring-boot-starter-data-jpa:$springBootVersion"
 	compile "org.postgresql:postgresql:42.2.0"
 	compile "org.flywaydb:flyway-core:5.0.7"
 
+    // swagger
+    compile "io.springfox:springfox-swagger2:$swaggerVersion"
+    compile "io.springfox:springfox-swagger-ui:$swaggerVersion"
+
 	// Kotlin
-	compile "org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.2.20"
-	compile "org.jetbrains.kotlin:kotlin-reflect:1.2.20"
+	compile "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlinVersion"
+	compile "org.jetbrains.kotlin:kotlin-reflect:$kotlinVersion"
 	compile "io.github.microutils:kotlin-logging:1.5.4"
 
-	testCompile "org.springframework.boot:spring-boot-starter-test:2.0.2.RELEASE"
+	testCompile "org.springframework.boot:spring-boot-starter-test:$springBootVersion"
+}
+
+test {
+	testLogging {
+		events "failed"
+		exceptionFormat "full"
+	}
 }
