@@ -1,7 +1,5 @@
-.gradle
 .idea
 .env
 application-local.yml
-build
 out
 data

@@ -1,0 +1,9 @@
+spring:
+  profiles: docker
+  datasource:
+    url: jdbc:postgresql://database:5432/degel
+    username: degel
+    password: password
+
+app:
+  envName: docker
