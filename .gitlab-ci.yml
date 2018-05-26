@@ -38,6 +38,11 @@ test:
 release:
   stage: release
   image: docker:latest
+  cache:
+    key: "$CI_COMMIT_REF_NAME"
+    policy: pull
+    paths:
+      - build
   only:
     - "master"
   before_script:
