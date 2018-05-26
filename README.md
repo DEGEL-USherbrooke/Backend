@@ -2,7 +2,8 @@
 
 ## Prepation
 - Create `application-local.yml` with the following content:
-```
+
+```yaml
 spring:
   profiles: local
   datasource:
@@ -13,8 +14,14 @@ spring:
 app:
   envName: local
 ```
+
 - (Only for docker) Create a `.env` file with the following content:
+
 ```
 POSTGRES_USER=degel
 POSTGRES_PASSWORD=password
 ```
+
+## Running
+- For local deployment, run `./deploy-local.sh`.
+- For dev deployment, run `docker-compose -f docker-compose.dev.yml up -d`
