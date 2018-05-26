@@ -1,6 +1,3 @@
-# This is the Gradle build system for JVM applications
-# https://gradle.org/
-# https://github.com/gradle/gradle
 image: gradle:alpine
 
 # Disable the Gradle daemon for Continuous Integration servers as correctness
@@ -13,6 +10,11 @@ variables:
 before_script:
   - export GRADLE_USER_HOME=`pwd`/.gradle
 
+stages:
+  - build
+  - test
+  - release
+
 build:
   stage: build
   script: gradle --build-cache assemble
@@ -23,7 +25,6 @@ build:
       - build
       - .gradle
 
-
 test:
   stage: test
   script: gradle check
@@ -33,3 +34,22 @@ test:
     paths:
       - build
       - .gradle
+
+release:
+  stage: release
+  image: docker:latest
+  only:
+    - "master"
+  services:
+    - docker:dind
+  variables:
+    DOCKER_DRIVER: "overlay"
+  before_script:
+    - docker version
+    - "docker info"
+    - "docker login -u gitlab-ci-token -p $CI_BUILD_TOKEN $CI_REGISTRY"
+  script:
+    - "docker build -t ${CI_REGISTRY}/${CI_PROJECT_PATH}:latest --pull ."
+    - "docker push ${CI_REGISTRY}/${CI_PROJECT_PATH}:latest"
+  after_script:
+    - "docker logout ${CI_REGISTRY}"

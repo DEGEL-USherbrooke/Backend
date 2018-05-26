@@ -11,8 +11,17 @@ services:
       - .env
   service:
     restart: always
-    build: ./
+    image: s6igitlab.gel.usherbrooke.ca:4567/degel/degel-backend:latest
     ports:
       - 8080:8080
+    environment:
+      - VIRTUAL_HOST=localhost
+      - VIRTUAL_PORT=8080
     depends_on:
       - database
+  nginx-proxy:
+    image: jwilder/nginx-proxy
+    ports:
+      - 80:80
+    volumes:
+      - /var/run/docker.sock:/tmp/docker.sock:ro
