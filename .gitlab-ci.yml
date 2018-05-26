@@ -40,13 +40,8 @@ release:
   image: docker:latest
   only:
     - "master"
-  services:
-    - docker:dind
-  variables:
-    DOCKER_DRIVER: "overlay"
   before_script:
     - docker version
-    - "docker info"
     - "docker login -u gitlab-ci-token -p $CI_BUILD_TOKEN $CI_REGISTRY"
   script:
     - "docker build -t ${CI_REGISTRY}/${CI_PROJECT_PATH}:latest --pull ."
