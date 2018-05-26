@@ -1,15 +1,17 @@
 package ca.usherbrooke.degel.entities
 
-import java.util.*
+import ca.usherbrooke.degel.models.User
 import javax.persistence.Entity
-import javax.persistence.GeneratedValue
-import javax.persistence.Id
 import javax.persistence.Table
 
 @Entity
 @Table(name = "users")
-internal data class UserEntity (
-        @Id @GeneratedValue
-        val id: UUID
-
-) : ca.usherbrooke.degel.entities.Entity
+data class UserEntity(
+        val cip: String,
+        val token: String?
+) : BaseEntity() {
+    fun toModel(): User = User(
+            this.id!!,
+            this.cip,
+            this.token)
+}
