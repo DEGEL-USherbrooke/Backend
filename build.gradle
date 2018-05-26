@@ -63,6 +63,7 @@ dependencies {
 	compile "io.github.microutils:kotlin-logging:1.5.4"
 
 	testCompile "org.springframework.boot:spring-boot-starter-test:$springBootVersion"
+    testCompile "com.h2database:h2:1.3.164"
 }
 
 test {
