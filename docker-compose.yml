@@ -20,6 +20,7 @@ services:
     depends_on:
       - database
   nginx-proxy:
+    restart: always
     image: jwilder/nginx-proxy
     ports:
       - 80:80
