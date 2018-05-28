@@ -14,10 +14,13 @@ stages:
   - build
   - test
   - release
+  - deploy
 
 build:
   stage: build
-  script: gradle --build-cache assemble
+  script: 
+    - echo "$SPRING_DEPLOY_PROFILE" > ./src/main/resources/application-deploy.yml
+    - gradle --build-cache assemble
   cache:
     key: "$CI_COMMIT_REF_NAME"
     policy: push
