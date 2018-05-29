@@ -1,5 +1,37 @@
+# Deploy docker-compose to use on a publicly avaiable server.
+#
+# Please modify the hosts to work on your current deployment setup.
+# Will also require a new profile for the application (not included in the source)
+#
+# NOTE: The DNS parameters are needed because there is a bug in docker-compose on centos preventing it to get the DNS servernames from the host.
+# This means it is not able to resolve external hosts if we don't specify a DNS. We kept one service without a DNS, because otherwise it will
+# switch to the default bridge network and we will lose the service discovery and the isolation from the host.
 version: "3"
 services:
+  nginx-proxy:
+    restart: always
+    image: jwilder/nginx-proxy
+    dns: 132.210.7.13
+    ports:
+      - 80:80
+      - 443:443
+    labels:
+      - com.github.jrcs.letsencrypt_nginx_proxy_companion.nginx_proxy
+    volumes:
+      - ./nginx/certs:/etc/nginx/certs:ro
+      - ./nginx/vhost.d:/etc/nginx/vhost.d
+      - ./nginx/html:/usr/share/nginx/html
+      - /var/run/docker.sock:/tmp/docker.sock:ro
+  letsencrypt:
+    image: jrcs/letsencrypt-nginx-proxy-companion
+    dns: 132.210.7.13
+    volumes:
+      - ./nginx/certs:/etc/nginx/certs:rw
+      - ./nginx/vhost.d:/etc/nginx/vhost.d
+      - ./nginx/html:/usr/share/nginx/html
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    depends_on:
+      - nginx-proxy
   database:
     restart: always
     ports:
@@ -14,9 +46,12 @@ services:
     image: s6igitlab.gel.usherbrooke.ca:4567/degel/degel-backend:latest
     ports:
       - 8080:8080
+    dns: 132.210.7.13
     environment:
-      - VIRTUAL_HOST=localhost
+      - VIRTUAL_HOST=localhost,s6iprojet02.gel.usherbrooke.ca
       - VIRTUAL_PORT=8080
+      - LETSENCRYPT_HOST=s6iprojet02.gel.usherbrooke.ca
+      - LETSENCRYPT_EMAIL=degel.usherbrooke@gmail.com
     entrypoint:
       - java
       - -Djava.security.egd=file:/dev/./urandom
@@ -25,10 +60,5 @@ services:
       - app.jar
     depends_on:
       - database
-  nginx-proxy:
-    restart: always
-    image: jwilder/nginx-proxy
-    ports:
-      - 80:80
-    volumes:
-      - /var/run/docker.sock:/tmp/docker.sock:ro
+      - nginx-proxy
+      - letsencrypt
