@@ -1,24 +1,40 @@
 package ca.usherbrooke.degel.controllers
 
-import org.springframework.security.core.userdetails.UserDetails
+import ca.usherbrooke.degel.config.exceptions.RestException
+import ca.usherbrooke.degel.exceptions.ServerSideException
+import ca.usherbrooke.degel.models.Value
 import org.springframework.security.core.context.SecurityContextHolder
-import org.springframework.stereotype.Controller
-import org.springframework.ui.ModelMap
+import org.springframework.security.core.userdetails.UserDetails
+import org.springframework.security.oauth2.common.exceptions.OAuth2Exception
 import org.springframework.web.bind.annotation.GetMapping
-import org.springframework.web.bind.annotation.RequestMapping
+import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
+import javax.servlet.http.HttpServletRequest
 
 @RestController
-@RequestMapping(value = "/secured")
-class SecuredPageController {
+class AuthController {
+    @GetMapping("/oauth/error")
+    fun error(request: HttpServletRequest): RestException {
+        val error = request.getAttribute("error")
 
-    @GetMapping
-    fun index(): String {
-        val auth = SecurityContextHolder.getContext().authentication
-        if (auth != null && auth.principal != null
-                && auth.principal is UserDetails) {
-            return "${(auth.principal as UserDetails).username}"
+        if (error is OAuth2Exception) {
+            return RestException(error.oAuth2ErrorCode, error.message.orEmpty())
         }
-        return ""
+
+        return RestException("oauth_error", "OAuth error")
+    }
+
+    @GetMapping("/oauth/callback")
+    fun callback(@RequestParam("code") code: String): Value<String> {
+        return Value(code)
+    }
+
+    @GetMapping("/api/whoami")
+    fun whoami(): Value<String> {
+        val auth = SecurityContextHolder.getContext().authentication
+        if (auth != null && auth.principal != null && auth.principal is UserDetails) {
+            return Value((auth.principal as UserDetails).username)
+        }
+        throw ServerSideException("No user authenticated")
     }
 }

@@ -6,4 +6,4 @@ spring:
     password: password
 
 app:
-  envName: local
+  location: http://localhost:8080

@@ -1,4 +1,4 @@
-package ca.usherbrooke.degel.security
+package ca.usherbrooke.degel.services
 
 import com.google.common.collect.Lists
 import org.springframework.security.core.authority.SimpleGrantedAuthority
@@ -6,7 +6,7 @@ import org.springframework.security.core.userdetails.User
 import org.springframework.security.core.userdetails.UserDetails
 import org.springframework.security.core.userdetails.UserDetailsService
 
-class CustomUserDetailsService : UserDetailsService {
+class UserDetailsServiceImpl : UserDetailsService {
     private val NON_EXISTENT_PASSWORD_VALUE = "NO_PASSWORD"
 
     override fun loadUserByUsername(username: String?): UserDetails {
