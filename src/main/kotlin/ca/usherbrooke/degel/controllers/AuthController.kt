@@ -2,6 +2,7 @@ package ca.usherbrooke.degel.controllers
 
 import ca.usherbrooke.degel.config.exceptions.RestException
 import ca.usherbrooke.degel.exceptions.ServerSideException
+import ca.usherbrooke.degel.models.AuthorizationCode
 import ca.usherbrooke.degel.models.Value
 import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.security.core.userdetails.UserDetails
@@ -25,8 +26,9 @@ class AuthController {
     }
 
     @GetMapping("/oauth/callback")
-    fun callback(@RequestParam("code") code: String): Value<String> {
-        return Value(code)
+    fun callback(@RequestParam("code") code: String,
+                 @RequestParam("state") state: String): AuthorizationCode {
+        return AuthorizationCode(code, state)
     }
 
     @GetMapping("/api/whoami")

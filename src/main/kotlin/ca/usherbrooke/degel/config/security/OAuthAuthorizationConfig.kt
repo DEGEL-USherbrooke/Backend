@@ -25,7 +25,7 @@ class OAuthAuthorizationConfig(
 
     override fun configure(clients: ClientDetailsServiceConfigurer) {
         clients.inMemory()
-                .withClient("SampleClientId")
+                .withClient("MobileApp")
                 .secret("{noop}")
                 .authorizedGrantTypes("authorization_code", "refresh_token")
                 .scopes("user_info")

@@ -10,10 +10,12 @@ import org.springframework.context.annotation.Primary
 import org.springframework.security.cas.ServiceProperties
 import org.springframework.security.cas.authentication.CasAuthenticationProvider
 import org.springframework.security.cas.web.CasAuthenticationEntryPoint
+import org.springframework.security.core.userdetails.UserDetailsService
 import org.springframework.security.web.AuthenticationEntryPoint
 
 @Configuration
 class CasAuthorizationConfig(
+        val userDetailsService: UserDetailsService,
         @Value("\${app.location}") val location: String,
         @Value("\${app.security.cas-server}") val casServer: String
 ) {
@@ -47,7 +49,7 @@ class CasAuthorizationConfig(
         val provider = CasAuthenticationProvider()
         provider.setServiceProperties(serviceProperties())
         provider.setTicketValidator(ticketValidator())
-        provider.setUserDetailsService(UserDetailsServiceImpl())
+        provider.setUserDetailsService(userDetailsService)
         provider.setKey("CAS_PROVIDER_USHERBROOKE")
         return provider
     }

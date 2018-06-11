@@ -11,7 +11,11 @@ data class UserEntity(
         val token: String?
 ) : BaseEntity() {
     fun toModel(): User = User(
-            this.id!!,
+            this.id,
             this.cip,
             this.token)
+
+    companion object {
+        fun fromModel(user: User) = UserEntity(user.cip, user.token)
+    }
 }
