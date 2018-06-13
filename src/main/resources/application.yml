@@ -16,5 +16,3 @@ spring:
 app:
   security:
     cas-server: https://cas.usherbrooke.ca
-    access-token-validity: 7200
-    refresh-token-validity: 10368000
