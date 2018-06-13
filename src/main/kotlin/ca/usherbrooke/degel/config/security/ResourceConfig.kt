@@ -20,11 +20,6 @@ class ResourceConfig(val serviceProperties: ServiceProperties) : ResourceServerC
                 .anonymous().disable()
                 .authorizeRequests()
                 .antMatchers(HttpMethod.OPTIONS).permitAll()
-                // when restricting access to 'Roles' you must remove the "ROLE_" part role
-                // for "ROLE_USER" use only "USER"
-                //.antMatchers("/api/hello").access("hasAnyRole('USER')")
-                //.antMatchers("/api/admin").hasRole("ADMIN")
-                // restricting all access to /api/** to authenticated users
                 .antMatchers("/api/**").authenticated()
     }
 

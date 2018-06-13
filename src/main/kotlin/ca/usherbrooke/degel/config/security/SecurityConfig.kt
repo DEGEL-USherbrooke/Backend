@@ -9,6 +9,7 @@ import org.springframework.security.cas.ServiceProperties
 import org.springframework.security.cas.authentication.CasAuthenticationProvider
 import org.springframework.security.cas.web.CasAuthenticationFilter
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder
+import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity
 import org.springframework.security.config.annotation.web.builders.HttpSecurity
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter
@@ -17,6 +18,7 @@ import java.util.*
 
 @Configuration
 @EnableWebSecurity
+@EnableGlobalMethodSecurity(prePostEnabled = true)
 class SecurityConfig(val authenticationProvider: CasAuthenticationProvider,
                      val serviceProperties: ServiceProperties,
                      val authenticationEntryPoint: AuthenticationEntryPoint) : WebSecurityConfigurerAdapter() {

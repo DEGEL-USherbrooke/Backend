@@ -4,6 +4,7 @@ import ca.usherbrooke.degel.exceptions.ClientSideException
 import ca.usherbrooke.degel.exceptions.ServerSideException
 import mu.KotlinLogging
 import org.springframework.http.HttpStatus
+import org.springframework.security.access.AccessDeniedException
 import org.springframework.web.bind.annotation.ControllerAdvice
 import org.springframework.web.bind.annotation.ExceptionHandler
 import org.springframework.web.bind.annotation.ResponseBody
@@ -18,6 +19,11 @@ class ExceptionProcessor {
     @ResponseStatus(HttpStatus.NOT_FOUND)
     @ResponseBody
     fun noHandlerFoundException() = RestException("not_found", "Not found")
+
+    @ExceptionHandler(AccessDeniedException::class)
+    @ResponseStatus(HttpStatus.FORBIDDEN)
+    @ResponseBody
+    fun accessDeniedException(e: AccessDeniedException) = RestException("access_denied", "Access denied")
 
     @ExceptionHandler(ClientSideException::class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
