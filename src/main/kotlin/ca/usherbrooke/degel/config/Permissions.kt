@@ -1,0 +1,13 @@
+package ca.usherbrooke.degel.config
+
+object Permissions {
+    // User
+    const val HAS_USER_ROLE: String = "hasRole('USER')"
+    const val USER_OWN_RESSOURCE : String = "($HAS_USER_ROLE and #id == principal.id)"
+
+    // Admin
+    const val HAS_ADMIN_ROLE: String = "hasRole('ADMIN')"
+
+    // Trusted client
+    const val HAS_TRUSTED_CLIENT_ROLE: String = "hasRole('TRUSTED_CLIENT')"
+}

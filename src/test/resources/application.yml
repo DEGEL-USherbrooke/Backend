@@ -4,3 +4,8 @@ spring:
    # exclude:
     #  - org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration
      # - org.springframework.boot.autoconfigure.orm.jpa.HibernateJpaAutoConfiguration
+
+app:
+  location: http://localhost:9999
+  security:
+      cas-server: https://toto.ca

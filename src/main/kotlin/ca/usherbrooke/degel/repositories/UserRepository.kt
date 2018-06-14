@@ -6,4 +6,6 @@ import java.util.*
 import javax.transaction.Transactional
 
 @Transactional(Transactional.TxType.MANDATORY)
-interface UserRepository : JpaRepository<UserEntity, UUID>
+interface UserRepository : JpaRepository<UserEntity, UUID> {
+    fun findByCip(cip: String): UserEntity?
+}
