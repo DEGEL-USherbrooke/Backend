@@ -23,13 +23,13 @@ class UserController(val userService: UserService) {
     @PreAuthorize(HAS_USER_ROLE)
     @GetMapping("/user/current")
     fun getCurrentUser(): User {
-        val userDetails = SecurityContextHolder.getContext().authentication.details
-        if (userDetails is UserDetailsImpl) {
-            return userService.getUser(userDetails.id)
+        val principal = SecurityContextHolder.getContext().authentication.principal
+        if (principal is UserDetailsImpl) {
+            return userService.getUser(principal.id)
         }
 
         // Should not happen
-        throw BadAuthentificationException(userDetails)
+        throw BadAuthentificationException(principal)
     }
 
     @PreAuthorize(HAS_ADMIN_ROLE)
