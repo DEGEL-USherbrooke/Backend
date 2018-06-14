@@ -1,13 +1,7 @@
 package ca.usherbrooke.degel.controllers
 
-import ca.usherbrooke.degel.config.Permissions.HAS_USER_ROLE
 import ca.usherbrooke.degel.config.exceptions.RestException
-import ca.usherbrooke.degel.exceptions.ServerSideException
 import ca.usherbrooke.degel.models.AuthorizationCode
-import ca.usherbrooke.degel.models.Value
-import org.springframework.security.access.prepost.PreAuthorize
-import org.springframework.security.core.context.SecurityContextHolder
-import org.springframework.security.core.userdetails.UserDetails
 import org.springframework.security.oauth2.common.exceptions.OAuth2Exception
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.RequestParam
@@ -31,15 +25,5 @@ class AuthController {
     fun callback(@RequestParam("code") code: String,
                  @RequestParam("state") state: String): AuthorizationCode {
         return AuthorizationCode(code, state)
-    }
-
-    @PreAuthorize(HAS_USER_ROLE)
-    @GetMapping("/api/whoami")
-    fun whoami(): Value<String> {
-        val auth = SecurityContextHolder.getContext().authentication
-        if (auth != null && auth.principal != null && auth.principal is UserDetails) {
-            return Value((auth.principal as UserDetails).username)
-        }
-        throw ServerSideException("No user authenticated")
     }
 }

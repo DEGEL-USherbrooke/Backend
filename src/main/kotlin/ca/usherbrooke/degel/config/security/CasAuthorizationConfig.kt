@@ -1,6 +1,5 @@
 package ca.usherbrooke.degel.config.security
 
-import ca.usherbrooke.degel.services.UserDetailsServiceImpl
 import org.jasig.cas.client.validation.Cas20ServiceTicketValidator
 import org.jasig.cas.client.validation.TicketValidator
 import org.springframework.beans.factory.annotation.Value
