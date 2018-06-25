@@ -19,7 +19,7 @@ data class UserEntity(
         @Column(name = "authority")
         @Convert(converter = GrantedAuthorityConverter::class)
         val authorities: Set<GrantedAuthority>
-) : BaseEntity() {
+) : DatedEntity() {
     fun toModel(): User = User(
             this.id,
             this.cip,
