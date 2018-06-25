@@ -42,6 +42,12 @@ compileTestKotlin {
 
 repositories {
     jcenter()
+    maven { url "https://repo.spring.io/snapshot" }
+    maven { url "https://repo.spring.io/milestone" }
+}
+
+ext {
+    springCloudVersion = 'Finchley.BUILD-SNAPSHOT'
 }
 
 dependencies {
@@ -67,9 +73,18 @@ dependencies {
     compile "org.jetbrains.kotlin:kotlin-reflect:$kotlinVersion"
     compile "io.github.microutils:kotlin-logging:1.5.4"
 
+    //Feign
+    compile('org.springframework.cloud:spring-cloud-starter-openfeign')
+
     testCompile "org.springframework.boot:spring-boot-starter-test:$springBootVersion"
     testCompile "com.h2database:h2:1.3.164"
     testImplementation "io.mockk:mockk:1.8.3"
+}
+
+dependencyManagement {
+    imports {
+        mavenBom "org.springframework.cloud:spring-cloud-dependencies:${springCloudVersion}"
+    }
 }
 
 test {
