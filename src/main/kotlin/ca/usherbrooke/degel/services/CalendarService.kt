@@ -6,12 +6,15 @@ import biweekly.component.VEvent
 import ca.usherbrooke.degel.clients.HorariusClient
 import ca.usherbrooke.degel.entities.CalendarEntity
 import ca.usherbrooke.degel.exceptions.CalendarCouldNotBeFetchedException
+import ca.usherbrooke.degel.exceptions.CalendarKeyInvalidException
 import ca.usherbrooke.degel.exceptions.CalendarKeyNotFoundException
 import ca.usherbrooke.degel.exceptions.DegelException
 import ca.usherbrooke.degel.models.CalendarDiff
 import ca.usherbrooke.degel.models.Value
 import ca.usherbrooke.degel.repositories.CalendarRepository
+import feign.FeignException
 import mu.KotlinLogging
+import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.util.*
@@ -29,6 +32,8 @@ class CalendarServiceImpl(val calendarRepository: CalendarRepository,
     @Transactional
     @Throws(DegelException::class)
     override fun getCalendar(userId: UUID) : String {
+        logger.info("User $userId requests his calendar")
+
         val calendarEntity = calendarRepository.findByUserId(userId)
 
         if (calendarEntity == null || calendarEntity.key.isEmpty())
@@ -42,8 +47,10 @@ class CalendarServiceImpl(val calendarRepository: CalendarRepository,
             calendarRepository.save(calendarEntity)
 
             return Biweekly.writeJson(calendarEntity.calendar).go()
-        } catch (e: Exception) {
-            logger.error("Error when fetching calendar", e)
+        } catch (e: FeignException) {
+            if(e.status() == HttpStatus.BAD_REQUEST.value())
+                throw CalendarKeyInvalidException(userId)
+
             throw CalendarCouldNotBeFetchedException(userId, e)
         }
     }
