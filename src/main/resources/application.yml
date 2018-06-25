@@ -22,3 +22,4 @@ app:
     cas-server: https://cas.usherbrooke.ca
   calendar:
     horarius: https://www.gel.usherbrooke.ca/horarius
+    refresh-delay: 300000 # 5min

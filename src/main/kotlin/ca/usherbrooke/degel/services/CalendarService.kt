@@ -1,6 +1,7 @@
 package ca.usherbrooke.degel.services
 
 import biweekly.Biweekly
+import biweekly.ICalendar
 import ca.usherbrooke.degel.clients.HorariusClient
 import ca.usherbrooke.degel.entities.CalendarEntity
 import ca.usherbrooke.degel.exceptions.CalendarCouldNotBeFetchedException
@@ -17,7 +18,9 @@ import org.springframework.transaction.annotation.Transactional
 import java.util.*
 
 interface CalendarService {
-    fun getCalendar(userId: UUID) : String
+    fun getCalendar(userId: UUID) : ICalendar
+    fun getStoredCalendar(userId: UUID) : ICalendar?
+    fun updateStoredCalendar(userId: UUID, calendar: ICalendar, fetchDate: Date)
     fun upsertCalendarKey(userId: UUID, key: String) : Value<String>
 }
 
@@ -28,9 +31,7 @@ class CalendarServiceImpl(private val calendarRepository: CalendarRepository,
                           private val horariusClient: HorariusClient) : CalendarService {
     @Transactional
     @Throws(DegelException::class)
-    override fun getCalendar(userId: UUID) : String {
-        logger.info("User $userId requests his calendar")
-
+    override fun getCalendar(userId: UUID) : ICalendar {
         val calendarEntity = calendarRepository.findByUserId(userId)
 
         if (calendarEntity == null || calendarEntity.key.isEmpty())
@@ -38,18 +39,26 @@ class CalendarServiceImpl(private val calendarRepository: CalendarRepository,
 
         try {
             val rawCalendar = horariusClient.getCalendar(calendarEntity.key)
-            calendarEntity.calendar = Biweekly.parse(rawCalendar).first()
-            calendarEntity.lastFetch = Date()
-
-            calendarRepository.save(calendarEntity)
-
-            return Biweekly.writeJson(calendarEntity.calendar).go()
+            return Biweekly.parse(rawCalendar).first()
         } catch (e: FeignException) {
-            if(e.status() == HttpStatus.BAD_REQUEST.value())
+            if(e.status() == HttpStatus.BAD_REQUEST.value()) {
+                logger.error("Calendar key of user $userId is invalid")
                 throw CalendarKeyInvalidException(userId)
+            }
 
             throw CalendarCouldNotBeFetchedException(userId, e)
         }
+    }
+
+    @Transactional
+    override fun getStoredCalendar(userId: UUID) : ICalendar? {
+        val calendarEntity = calendarRepository.findByUserId(userId)
+        return calendarEntity?.calendar
+    }
+
+    @Transactional
+    override fun updateStoredCalendar(userId: UUID, calendar: ICalendar, fetchDate: Date) {
+        calendarRepository.setCalendar(calendar, fetchDate, userId)
     }
 
     @Transactional

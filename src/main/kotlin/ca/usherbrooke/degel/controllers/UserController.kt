@@ -35,4 +35,8 @@ class UserController(val userService: UserService) {
     @PreAuthorize(HAS_ADMIN_ROLE)
     @PostMapping("/user")
     fun upsertUser(@RequestBody user: User) : User = userService.upsertUser(user)
+
+    @PreAuthorize(HAS_ADMIN_ROLE)
+    @GetMapping("/user")
+    fun getAllUsers() = userService.getUsersId()
 }
