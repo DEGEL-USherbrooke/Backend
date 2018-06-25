@@ -1,5 +1,7 @@
 package ca.usherbrooke.degel.services
 
+import biweekly.Biweekly
+import biweekly.ICalendar
 import ca.usherbrooke.degel.clients.HorariusClient
 import ca.usherbrooke.degel.entities.CalendarEntity
 import ca.usherbrooke.degel.exceptions.CalendarCouldNotBeFetchedException
@@ -30,6 +32,8 @@ class CalendarServiceTests {
         const val ANOTHER_CALENDAR_KEY = "luke you are my son"
         val USER_ID = UUID.randomUUID()
         val CALENDAR_DATA = IOUtils.toString(this::class.java.getResourceAsStream("/calendars/icalendar.ics"), StandardCharsets.UTF_8)
+        val CALENDAR = Biweekly.parse(CALENDAR_DATA).first()
+        val NOW = Date()
     }
 
     val calendarRepositoryMock = mockk<CalendarRepository>()
@@ -83,17 +87,12 @@ class CalendarServiceTests {
 
     @Test
     fun `get user calendar`() {
-        val entity = slot<CalendarEntity>()
-
         every { calendarRepositoryMock.findByUserId(USER_ID) } returns CalendarEntity(USER_ID, CALENDAR_KEY)
                 .also { s -> s.id = UUID.randomUUID() }
         every { horariusClientMock.getCalendar(CALENDAR_KEY) } returns CALENDAR_DATA
-        every { calendarRepositoryMock.save(capture(entity)) } answers { entity.captured }
 
         val data = calendarService.getCalendar(USER_ID)
 
-        verify { calendarRepositoryMock.save(any<CalendarEntity>()) }
-        assertNotNull(entity.captured.calendar)
         assertNotNull(data)
     }
 
@@ -113,5 +112,29 @@ class CalendarServiceTests {
         every { horariusClientMock.getCalendar(CALENDAR_KEY) } throws FeignRandomException()
 
         calendarService.getCalendar(USER_ID)
+    }
+
+    @Test
+    fun `get stored calendar`() {
+        every { calendarRepositoryMock.findByUserId(USER_ID) } returns CalendarEntity(USER_ID, CALENDAR_KEY, NOW, CALENDAR)
+                .also { s -> s.id = UUID.randomUUID() }
+
+        val calendar = calendarService.getStoredCalendar(USER_ID)
+
+        assertEquals(CALENDAR, calendar)
+    }
+
+    @Test
+    fun `update calendar for user`() {
+        val calendar = slot<ICalendar>()
+        val userId = slot<UUID>()
+
+        every { calendarRepositoryMock.setCalendar(capture(calendar), any(), capture(userId)) } returns Unit
+
+        calendarService.updateStoredCalendar(USER_ID, CALENDAR, NOW)
+
+        verify { calendarRepositoryMock.setCalendar(any(), any(), any()) }
+        assertEquals(CALENDAR, calendar.captured)
+        assertEquals(USER_ID, userId.captured)
     }
 }
