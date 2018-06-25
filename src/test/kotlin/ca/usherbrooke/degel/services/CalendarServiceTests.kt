@@ -6,6 +6,9 @@ import org.junit.runner.RunWith
 import org.mockito.junit.MockitoJUnitRunner
 import java.nio.charset.StandardCharsets
 import biweekly.Biweekly
+import ca.usherbrooke.degel.clients.HorariusClient
+import ca.usherbrooke.degel.repositories.CalendarRepository
+import io.mockk.mockk
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 
@@ -13,7 +16,11 @@ import org.junit.Assert.assertFalse
 @RunWith(MockitoJUnitRunner::class)
 class CalendarServiceTests {
 
-    val calendarService = CalendarServiceImpl()
+    val calendarRepositoryMock = mockk<CalendarRepository>()
+
+    val horariusClient = mockk<HorariusClient>()
+
+    val calendarService = CalendarServiceImpl(calendarRepositoryMock, horariusClient)
 
     @Test
     fun `test diff calendars`() {

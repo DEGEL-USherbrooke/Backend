@@ -13,6 +13,12 @@ spring:
   resources:
     add-mappings: false
 
+  feign:
+    okhttp:
+      enabled: true
+
 app:
   security:
     cas-server: https://cas.usherbrooke.ca
+  calendar:
+    horarius: https://www.gel.usherbrooke.ca/horarius
