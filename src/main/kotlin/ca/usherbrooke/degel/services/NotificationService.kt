@@ -12,10 +12,9 @@ interface NotificationService {
 }
 
 @Service
-class NotificationServiceImpl(private val notificationRepository: NotificationRepository) : NotificationService { //private val client: ExpoNotificationClient
+class NotificationServiceImpl(private val notificationRepository: NotificationRepository) : NotificationService {
 
     override fun notificationRegister(id: UUID, token: String): Notification {
-
         val oldToken = notificationRepository.findByExpoToken(token)
 
         if (oldToken != null) {

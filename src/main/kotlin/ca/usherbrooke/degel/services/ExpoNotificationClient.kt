@@ -13,5 +13,5 @@ import org.springframework.web.bind.annotation.RequestBody
 interface ExpoNotificationClient {
     @PostMapping
     @Headers("Content-Type: application/json")
-    fun validateClient(@RequestBody body: String): String
+    fun sendNotification(@RequestBody body: String): String
 }
