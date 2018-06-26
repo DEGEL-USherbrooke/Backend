@@ -1,21 +1,38 @@
 package ca.usherbrooke.degel.services
 
+import ca.usherbrooke.degel.entities.NotificationEntity
+import ca.usherbrooke.degel.models.Notification
+import ca.usherbrooke.degel.repositories.NotificationRepository
 import org.springframework.stereotype.Service
+import org.springframework.transaction.annotation.Transactional
+import java.util.*
 
 interface NotificationService {
-    fun validateClient(title: String, description: String) : String
+    fun notificationRegister(id: UUID, token: String): Notification
 }
 
 @Service
-class NotificationServiceImpl(private val client: ExpoNotificationClient) : NotificationService {
-    override fun validateClient(title: String, description: String) : String {
+class NotificationServiceImpl(private val notificationRepository: NotificationRepository) : NotificationService { //private val client: ExpoNotificationClient
 
-        val body = "{\n" +
-                "  \"to\": \"ExponentPushToken[KjIqqZPDn4Hi0cPUzTqJfe]\",\n" +
-                "  \"title\": \"" + title + "\",\n" +
-                "  \"body\": \"" + description + "\"\n" +
-                "}"
+    override fun notificationRegister(id: UUID, token: String): Notification {
 
-        return client.validateClient(body)
+        val oldToken = notificationRepository.findByExpoToken(token)
+
+        if (oldToken != null) {
+            deleteOldToken(oldToken)
+        }
+
+        val notificationEntity = NotificationEntity.fromModel(id, Notification(token))
+        return addNewToken(notificationEntity)
+    }
+
+    @Transactional
+    fun deleteOldToken(token: NotificationEntity) {
+        notificationRepository.delete(token)
+    }
+
+    @Transactional
+    fun addNewToken(notificationEntity: NotificationEntity): Notification {
+        return notificationRepository.save(notificationEntity).toModel()
     }
 }
