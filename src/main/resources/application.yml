@@ -16,3 +16,6 @@ spring:
 app:
   security:
     cas-server: https://cas.usherbrooke.ca
+
+  notification:
+    expo-server: https://exp.host/--/api/v2/push/send

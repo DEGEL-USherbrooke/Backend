@@ -2,6 +2,7 @@ package ca.usherbrooke.degel.services
 
 import ca.usherbrooke.degel.entities.NotificationEntity
 import ca.usherbrooke.degel.models.Notification
+import ca.usherbrooke.degel.models.Value
 import ca.usherbrooke.degel.repositories.NotificationRepository
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -14,24 +15,24 @@ interface NotificationService {
 @Service
 class NotificationServiceImpl(private val notificationRepository: NotificationRepository) : NotificationService {
 
-    override fun notificationRegister(id: UUID, token: String): Notification {
-        val oldToken = notificationRepository.findByExpoToken(token)
+    override fun notificationRegister(id: UUID, tokenExpo: String): Notification {
+        val oldTokenExpo = notificationRepository.findByExpoToken(tokenExpo)
 
-        if (oldToken != null) {
-            deleteOldToken(oldToken)
+        if (oldTokenExpo != null) {
+            deleteOldNotificationEntity(oldTokenExpo)
         }
 
-        val notificationEntity = NotificationEntity.fromModel(id, Notification(token))
-        return addNewToken(notificationEntity)
+        val notificationEntity = NotificationEntity.fromModel(id, Notification(tokenExpo))
+        return addNewNotificationEntity(notificationEntity)
     }
 
     @Transactional
-    fun deleteOldToken(token: NotificationEntity) {
-        notificationRepository.delete(token)
+    fun deleteOldNotificationEntity(notificationEntity: NotificationEntity) {
+        notificationRepository.delete(notificationEntity)
     }
 
     @Transactional
-    fun addNewToken(notificationEntity: NotificationEntity): Notification {
+    fun addNewNotificationEntity(notificationEntity: NotificationEntity): Notification {
         return notificationRepository.save(notificationEntity).toModel()
     }
 }
