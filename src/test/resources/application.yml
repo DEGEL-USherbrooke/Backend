@@ -9,3 +9,6 @@ app:
   location: http://localhost:9999
   security:
       cas-server: https://toto.ca
+
+  notification:
+      expo-server: https://expo.ca
