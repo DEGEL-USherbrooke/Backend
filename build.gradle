@@ -50,6 +50,8 @@ dependencies {
     compile "org.springframework.boot:spring-boot-starter-security:$springBootVersion"
     compile "org.springframework.security.oauth:spring-security-oauth2:2.3.3.RELEASE"
     compile "org.springframework.security:spring-security-cas:5.0.5.RELEASE"
+    compile "org.springframework.cloud:spring-cloud-starter-openfeign:2.0.0.RELEASE"
+
 
     compile "com.fasterxml.jackson.module:jackson-module-kotlin:2.9.5"
 
