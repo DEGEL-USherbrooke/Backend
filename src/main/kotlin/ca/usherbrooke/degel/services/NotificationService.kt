@@ -9,20 +9,20 @@ import org.springframework.transaction.annotation.Transactional
 import java.util.*
 
 interface NotificationService {
-    fun notificationRegister(id: UUID, token: String): Notification
+    fun notificationRegister(id: UUID, token: Notification): Notification
 }
 
 @Service
 class NotificationServiceImpl(private val notificationRepository: NotificationRepository) : NotificationService {
 
-    override fun notificationRegister(id: UUID, tokenExpo: String): Notification {
-        val oldTokenExpo = notificationRepository.findByExpoToken(tokenExpo)
+    override fun notificationRegister(id: UUID, tokenExpo: Notification): Notification {
+        val oldTokenExpo = notificationRepository.findByExpoToken(tokenExpo.expoToken)
 
         if (oldTokenExpo != null) {
             deleteOldNotificationEntity(oldTokenExpo)
         }
 
-        val notificationEntity = NotificationEntity.fromModel(id, Notification(tokenExpo))
+        val notificationEntity = NotificationEntity.fromModel(id, Notification(tokenExpo.expoToken))
         return addNewNotificationEntity(notificationEntity)
     }
 

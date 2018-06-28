@@ -16,9 +16,9 @@ import java.util.*
 class NotificationServiceTests {
     companion object {
         val USER_ID = UUID.randomUUID()
-        val EXPO_TOKEN = "Token"
-        val EXPO_TOKEN1 = "Token1"
-        val NOTIFICATION = Notification(EXPO_TOKEN)
+        val EXPO_TOKEN = Notification("Token")
+        val EXPO_TOKEN1 = Notification("Token1")
+        val NOTIFICATION = Notification("Token")
     }
 
     private val notificationRepositoryMock = mockk<NotificationRepository>()
@@ -41,13 +41,13 @@ class NotificationServiceTests {
         val entityOldToken = slot<NotificationEntity>()
         val entityNewToken = slot<NotificationEntity>()
 
-        every { notificationRepositoryMock.findByExpoToken(any()) } returns NotificationEntity(USER_ID, EXPO_TOKEN1)
+        every { notificationRepositoryMock.findByExpoToken(any()) } returns NotificationEntity(USER_ID, EXPO_TOKEN1.expoToken)
         every { notificationRepositoryMock.delete(capture(entityOldToken)) } returns Unit
         every { notificationRepositoryMock.save(capture(entityNewToken)) } answers { entityNewToken.captured }
 
         val notificationToken = notificationService.notificationRegister(USER_ID, EXPO_TOKEN)
 
         assertEquals(NOTIFICATION, notificationToken)
-        assertEquals(entityOldToken.captured, NotificationEntity(USER_ID, EXPO_TOKEN1))
+        assertEquals(entityOldToken.captured, NotificationEntity(USER_ID, EXPO_TOKEN1.expoToken))
     }
 }
