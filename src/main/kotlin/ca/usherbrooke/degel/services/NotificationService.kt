@@ -2,14 +2,13 @@ package ca.usherbrooke.degel.services
 
 import ca.usherbrooke.degel.entities.NotificationEntity
 import ca.usherbrooke.degel.models.Notification
-import ca.usherbrooke.degel.models.Value
 import ca.usherbrooke.degel.repositories.NotificationRepository
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.util.*
 
 interface NotificationService {
-    fun notificationRegister(id: UUID, token: Notification): Notification
+    fun notificationRegister(id: UUID, tokenExpo: Notification): Notification
 }
 
 @Service
