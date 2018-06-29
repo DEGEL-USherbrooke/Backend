@@ -12,3 +12,5 @@ app:
   calendar:
       horarius: https://youarelost.ca
       refresh-delay: 1000
+  notification:
+      expo-server: https://expo.ca
