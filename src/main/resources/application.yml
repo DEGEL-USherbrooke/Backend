@@ -13,9 +13,15 @@ spring:
   resources:
     add-mappings: false
 
+  feign:
+    okhttp:
+      enabled: true
+
 app:
   security:
     cas-server: https://cas.usherbrooke.ca
-
+  calendar:
+    horarius: https://www.gel.usherbrooke.ca/horarius
+    refresh-delay: 300000 # 5min
   notification:
     expo-server: https://exp.host/--/api/v2/push/send

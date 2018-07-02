@@ -33,7 +33,10 @@ class ExceptionProcessor {
     @ExceptionHandler(ServerSideException::class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     @ResponseBody
-    fun serverSideException(e: ServerSideException) = RestException(e.error, "Server side exception")
+    fun serverSideException(e: ServerSideException) : RestException {
+        logger.error("Server side error: ${e.message}")
+        return RestException(e.error, "Server side exception")
+    }
 
     @ExceptionHandler(Exception::class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)

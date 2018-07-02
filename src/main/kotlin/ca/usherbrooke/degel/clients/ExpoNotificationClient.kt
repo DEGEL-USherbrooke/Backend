@@ -1,4 +1,4 @@
-package ca.usherbrooke.degel.services
+package ca.usherbrooke.degel.clients
 
 import feign.Headers
 import org.springframework.beans.factory.annotation.Autowired
