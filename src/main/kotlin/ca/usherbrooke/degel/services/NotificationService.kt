@@ -1,18 +1,36 @@
 package ca.usherbrooke.degel.services
 
+import ca.usherbrooke.degel.clients.ExpoNotificationClient
 import ca.usherbrooke.degel.entities.NotificationEntity
 import ca.usherbrooke.degel.models.Notification
 import ca.usherbrooke.degel.repositories.NotificationRepository
+import ca.usherbrooke.degel.repositories.UserRepository
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.util.*
 
 interface NotificationService {
     fun notificationRegister(id: UUID, tokenExpo: Notification): Notification
+    fun sendNotification(cip: String, title: String, description: String)
 }
 
 @Service
-class NotificationServiceImpl(private val notificationRepository: NotificationRepository) : NotificationService {
+class NotificationServiceImpl(private val notificationRepository: NotificationRepository, private val userRepository: UserRepository, private val expoNotificationClient: ExpoNotificationClient) : NotificationService {
+    override fun sendNotification(cip: String, title: String, description: String) {
+        val user = userRepository.findByCip(cip)
+
+        if (user != null) {
+
+            val notificationTokens = notificationRepository.findByUserID(user.id!!)
+
+            if (notificationTokens != null) {
+                for (notificationToken: NotificationEntity in notificationTokens) {
+                    val message =  constructMessage(notificationToken.expoToken, title, description)
+                    expoNotificationClient.sendNotification(message)
+                }
+            }
+        }
+    }
 
     override fun notificationRegister(id: UUID, tokenExpo: Notification): Notification {
         val oldTokenExpo = notificationRepository.findByExpoToken(tokenExpo.expoToken)
@@ -33,5 +51,14 @@ class NotificationServiceImpl(private val notificationRepository: NotificationRe
     @Transactional
     fun addNewNotificationEntity(notificationEntity: NotificationEntity): Notification {
         return notificationRepository.save(notificationEntity).toModel()
+    }
+
+    private fun constructMessage(expoToken: String, title: String, description: String): String {
+
+        return  "{\n" +
+                "  \"to\": \"" + expoToken + "\",\n" +
+                "  \"title\": \"" + title + "\",\n" +
+                "  \"body\": \"" + description + "\"\n" +
+                "}"
     }
 }
