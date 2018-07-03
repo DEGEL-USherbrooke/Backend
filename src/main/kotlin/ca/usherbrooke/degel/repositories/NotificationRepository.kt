@@ -10,5 +10,5 @@ interface NotificationRepository : JpaRepository<NotificationEntity, UUID> {
     fun findByExpoToken(tokenExpo: String): NotificationEntity?
 
     @Transactional
-    fun findByUserID(userID: UUID): List<NotificationEntity>?
+    fun findByUserId(userId: UUID): List<NotificationEntity>?
 }

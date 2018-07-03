@@ -21,7 +21,7 @@ class NotificationServiceImpl(private val notificationRepository: NotificationRe
 
         if (user != null) {
 
-            val notificationTokens = notificationRepository.findByUserID(user.id!!)
+            val notificationTokens = notificationRepository.findByUserId(user.id!!)
 
             if (notificationTokens != null) {
                 for (notificationToken: NotificationEntity in notificationTokens) {
@@ -40,6 +40,7 @@ class NotificationServiceImpl(private val notificationRepository: NotificationRe
         }
 
         val notificationEntity = NotificationEntity.fromModel(id, Notification(tokenExpo.expoToken))
+
         return addNewNotificationEntity(notificationEntity)
     }
 
@@ -54,7 +55,6 @@ class NotificationServiceImpl(private val notificationRepository: NotificationRe
     }
 
     private fun constructMessage(expoToken: String, title: String, description: String): String {
-
         return  "{\n" +
                 "  \"to\": \"" + expoToken + "\",\n" +
                 "  \"title\": \"" + title + "\",\n" +
