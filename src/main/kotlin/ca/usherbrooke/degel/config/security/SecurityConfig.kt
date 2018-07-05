@@ -18,7 +18,6 @@ import java.util.*
 
 @Configuration
 @EnableWebSecurity
-@EnableGlobalMethodSecurity(prePostEnabled = true)
 class SecurityConfig(val authenticationProvider: CasAuthenticationProvider,
                      val serviceProperties: ServiceProperties,
                      val authenticationEntryPoint: AuthenticationEntryPoint) : WebSecurityConfigurerAdapter() {

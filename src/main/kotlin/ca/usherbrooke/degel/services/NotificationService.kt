@@ -2,7 +2,9 @@ package ca.usherbrooke.degel.services
 
 import ca.usherbrooke.degel.clients.ExpoNotificationClient
 import ca.usherbrooke.degel.entities.NotificationEntity
+import ca.usherbrooke.degel.models.ExpoNotification
 import ca.usherbrooke.degel.models.Notification
+import ca.usherbrooke.degel.models.NotificationContent
 import ca.usherbrooke.degel.repositories.NotificationRepository
 import ca.usherbrooke.degel.repositories.UserRepository
 import org.springframework.stereotype.Service
@@ -11,7 +13,7 @@ import java.util.*
 
 interface NotificationService {
     fun notificationRegister(id: UUID, tokenExpo: Notification): Notification
-    fun sendNotification(cip: String, title: String, description: String)
+    fun sendNotification(notificationContent: NotificationContent)
 }
 
 @Service
@@ -19,16 +21,16 @@ class NotificationServiceImpl(private val notificationRepository: NotificationRe
                               private val userRepository: UserRepository,
                               private val expoNotificationClient: ExpoNotificationClient) : NotificationService {
     @Transactional
-    override fun sendNotification(cip: String, title: String, description: String) {
-        val user = userRepository.findByCip(cip)
+    override fun sendNotification(notificationContent: NotificationContent) {
+        val user = userRepository.findByCip(notificationContent.cip)
 
         if (user != null) {
             val notificationTokens = notificationRepository.findByUserId(user.id!!)
 
             if (notificationTokens != null) {
                 for (notificationToken: NotificationEntity in notificationTokens) {
-                    val message =  constructMessage(notificationToken.expoToken, title, description)
-                    expoNotificationClient.sendNotification(message)
+                    val expoNotification =  ExpoNotification(notificationToken.expoToken, notificationContent.title, notificationContent.description)
+                    expoNotificationClient.sendNotification(expoNotification)
                 }
             }
         }
@@ -54,13 +56,5 @@ class NotificationServiceImpl(private val notificationRepository: NotificationRe
     @Transactional
     fun addNewNotificationEntity(notificationEntity: NotificationEntity): Notification {
         return notificationRepository.save(notificationEntity).toModel()
-    }
-
-    private fun constructMessage(expoToken: String, title: String, description: String): String {
-        return  "{\n" +
-                "  \"to\": \"" + expoToken + "\",\n" +
-                "  \"title\": \"" + title + "\",\n" +
-                "  \"body\": \"" + description + "\"\n" +
-                "}"
     }
 }

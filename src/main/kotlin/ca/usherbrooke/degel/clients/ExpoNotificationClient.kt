@@ -1,5 +1,6 @@
 package ca.usherbrooke.degel.clients
 
+import ca.usherbrooke.degel.models.ExpoNotification
 import feign.Headers
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
@@ -14,5 +15,5 @@ import org.springframework.web.bind.annotation.RequestBody
 interface ExpoNotificationClient {
     @PostMapping
     @Headers("Content-Type: application/json")
-    fun sendNotification(@RequestBody body: String): String
+    fun sendNotification(@RequestBody body: ExpoNotification): String
 }
