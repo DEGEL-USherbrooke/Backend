@@ -8,4 +8,7 @@ import javax.transaction.Transactional
 interface NotificationRepository : JpaRepository<NotificationEntity, UUID> {
     @Transactional
     fun findByExpoToken(tokenExpo: String): NotificationEntity?
+
+    @Transactional
+    fun findByUserId(userId: UUID): List<NotificationEntity>?
 }
