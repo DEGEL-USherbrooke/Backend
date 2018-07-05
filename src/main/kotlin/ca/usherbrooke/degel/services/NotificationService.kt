@@ -2,6 +2,7 @@ package ca.usherbrooke.degel.services
 
 import ca.usherbrooke.degel.clients.ExpoNotificationClient
 import ca.usherbrooke.degel.entities.NotificationEntity
+import ca.usherbrooke.degel.models.ExpoNotification
 import ca.usherbrooke.degel.models.Notification
 import ca.usherbrooke.degel.models.NotificationContent
 import ca.usherbrooke.degel.repositories.NotificationRepository
@@ -28,8 +29,8 @@ class NotificationServiceImpl(private val notificationRepository: NotificationRe
 
             if (notificationTokens != null) {
                 for (notificationToken: NotificationEntity in notificationTokens) {
-                    val message =  constructMessage(notificationToken.expoToken, notificationContent.title, notificationContent.description)
-                    expoNotificationClient.sendNotification(message)
+                    val expoNotification =  ExpoNotification(notificationToken.expoToken, notificationContent.title, notificationContent.description)
+                    expoNotificationClient.sendNotification(expoNotification)
                 }
             }
         }
@@ -55,13 +56,5 @@ class NotificationServiceImpl(private val notificationRepository: NotificationRe
     @Transactional
     fun addNewNotificationEntity(notificationEntity: NotificationEntity): Notification {
         return notificationRepository.save(notificationEntity).toModel()
-    }
-
-    private fun constructMessage(expoToken: String, title: String, description: String): String {
-        return  "{\n" +
-                "  \"to\": \"" + expoToken + "\",\n" +
-                "  \"title\": \"" + title + "\",\n" +
-                "  \"body\": \"" + description + "\"\n" +
-                "}"
     }
 }
