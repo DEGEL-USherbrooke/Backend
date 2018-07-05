@@ -15,13 +15,14 @@ interface NotificationService {
 }
 
 @Service
-class NotificationServiceImpl(private val notificationRepository: NotificationRepository, private val userRepository: UserRepository, private val expoNotificationClient: ExpoNotificationClient) : NotificationService {
+class NotificationServiceImpl(private val notificationRepository: NotificationRepository,
+                              private val userRepository: UserRepository,
+                              private val expoNotificationClient: ExpoNotificationClient) : NotificationService {
     @Transactional
     override fun sendNotification(cip: String, title: String, description: String) {
         val user = userRepository.findByCip(cip)
 
         if (user != null) {
-
             val notificationTokens = notificationRepository.findByUserId(user.id!!)
 
             if (notificationTokens != null) {

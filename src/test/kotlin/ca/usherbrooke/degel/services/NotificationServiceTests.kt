@@ -1,8 +1,10 @@
 package ca.usherbrooke.degel.services
 
+import ca.usherbrooke.degel.clients.ExpoNotificationClient
 import ca.usherbrooke.degel.entities.NotificationEntity
 import ca.usherbrooke.degel.models.Notification
 import ca.usherbrooke.degel.repositories.NotificationRepository
+import ca.usherbrooke.degel.repositories.UserRepository
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.slot
@@ -22,7 +24,9 @@ class NotificationServiceTests {
     }
 
     private val notificationRepositoryMock = mockk<NotificationRepository>()
-    private val notificationService = NotificationServiceImpl(notificationRepositoryMock)
+    private val userRepositoryMock = mockk<UserRepository>()
+    private val expoClientMock = mockk<ExpoNotificationClient>()
+    private val notificationService = NotificationServiceImpl(notificationRepositoryMock, userRepositoryMock, expoClientMock)
 
     @Test
     fun `when new token add token`() {

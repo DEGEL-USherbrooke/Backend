@@ -14,6 +14,6 @@ import java.util.*
 class NotificationController(val service : NotificationService) {
 
     @PreAuthorize("${Permissions.USER_OWN_RESSOURCE} or ${Permissions.HAS_ADMIN_ROLE}")
-    @PostMapping("/user/{id}/notification/-")
+    @PostMapping("/user/{id}/notification/register")
     fun notificationRegister(@PathVariable id: UUID, @RequestBody body: Notification) = service.notificationRegister(id, body)
 }
