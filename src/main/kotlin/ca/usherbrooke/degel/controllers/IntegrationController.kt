@@ -1,0 +1,31 @@
+package ca.usherbrooke.degel.controllers
+
+import ca.usherbrooke.degel.config.Constants
+import ca.usherbrooke.degel.config.Permissions
+import ca.usherbrooke.degel.exceptions.FailedRegisterNotificationTypeException
+import ca.usherbrooke.degel.exceptions.FailedSendNotificationException
+import ca.usherbrooke.degel.models.NotifyUs.Notification
+import ca.usherbrooke.degel.models.NotifyUs.NotificationType
+import ca.usherbrooke.degel.services.IntegrationService
+import org.springframework.security.access.prepost.PreAuthorize
+import org.springframework.web.bind.annotation.PostMapping
+import org.springframework.web.bind.annotation.RequestBody
+import org.springframework.web.bind.annotation.RequestMapping
+import org.springframework.web.bind.annotation.RestController
+import springfox.documentation.annotations.ApiIgnore
+
+@RestController
+@RequestMapping(Constants.API)
+@ApiIgnore
+class IntegrationController(val service : IntegrationService) {
+
+    @PreAuthorize(Permissions.HAS_ADMIN_ROLE)
+    @PostMapping("/notification/notifyus/register")
+    @Throws(FailedRegisterNotificationTypeException::class)
+    fun registerNotifyUsNotification(@RequestBody notificationType: NotificationType) = service.registerNotifyUsNotificationType(notificationType)
+
+    @PreAuthorize(Permissions.HAS_ADMIN_ROLE)
+    @PostMapping("/notification/notifyus/send")
+    @Throws(FailedSendNotificationException::class)
+    fun sendNotifyUsNotification(@RequestBody notification: Notification) = service.sendNotifyUsNotification(notification)
+}

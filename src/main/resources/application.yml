@@ -25,3 +25,5 @@ app:
     refresh-delay: 300000 # 5min
   notification:
     expo-server: https://exp.host/--/api/v2/push/send
+    notifyus:
+      service: http://s6iprojet01.gel.usherbrooke.ca

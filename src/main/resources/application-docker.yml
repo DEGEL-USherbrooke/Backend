@@ -7,3 +7,7 @@ spring:
 
 app:
   location: http://localhost:8080
+  notification:
+    notifyus:
+      token: 237e9636-8783-4ada-a517-26b98444b5bc
+      calendar-notification: 445ed050-d122-4c94-9d57-8bd2615edb8a
