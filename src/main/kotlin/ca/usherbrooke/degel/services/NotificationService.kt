@@ -2,11 +2,13 @@ package ca.usherbrooke.degel.services
 
 import ca.usherbrooke.degel.clients.ExpoClient
 import ca.usherbrooke.degel.entities.NotificationTokenEntity
+import ca.usherbrooke.degel.exceptions.FailedSendNUNotificationException
 import ca.usherbrooke.degel.models.notification.ExpoNotification
 import ca.usherbrooke.degel.models.notification.NotificationToken
 import ca.usherbrooke.degel.models.notification.Notification
 import ca.usherbrooke.degel.repositories.NotificationTokenRepository
 import ca.usherbrooke.degel.repositories.UserRepository
+import mu.KLogging
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.util.*
@@ -20,18 +22,31 @@ interface NotificationService {
 class NotificationServiceImpl(private val notificationTokenRepository: NotificationTokenRepository,
                               private val userRepository: UserRepository,
                               private val expoClient: ExpoClient) : NotificationService {
+    companion object: KLogging()
+
     @Transactional
     override fun sendNotification(notification: Notification) {
-        val user = userRepository.findByCip(notification.cip)
+        // Find the corresponding user
+        var userId = notification.userId
 
-        if (user != null) {
-            val notificationTokens = notificationTokenRepository.findByUserId(user.id!!)
+        if (userId == null && notification.cip != null) {
+            val user = userRepository.findByCip(notification.cip)
+            userId = user?.id
+        }
 
-            if (notificationTokens != null) {
-                for (notificationToken: NotificationTokenEntity in notificationTokens) {
-                    val expoNotification = ExpoNotification(notificationToken.expoToken, notification.title, notification.description)
-                    expoClient.sendNotification(expoNotification)
-                }
+        // If cannot find it, do nothing (we don't know the user)
+        if (userId == null) {
+            logger.error("Cannot send notification. Unknown user: ${notification.cip}.")
+            return
+        }
+
+        // Send notification to all devices
+        val notificationTokens = notificationTokenRepository.findByUserId(userId)
+
+        if (notificationTokens != null) {
+            for (notificationToken: NotificationTokenEntity in notificationTokens) {
+                val expoNotification = ExpoNotification(notificationToken.expoToken, notification.title, notification.description)
+                expoClient.sendNotification(expoNotification)
             }
         }
     }

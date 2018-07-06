@@ -6,6 +6,8 @@ spring:
      # - org.springframework.boot.autoconfigure.orm.jpa.HibernateJpaAutoConfiguration
 
 app:
+  integration:
+    notifyus: false
   location: http://localhost:9999
   security:
       cas-server: https://toto.ca

@@ -1,10 +1,14 @@
 package ca.usherbrooke.degel.tasks
 
+import biweekly.component.VEvent
 import ca.usherbrooke.degel.exceptions.CalendarKeyNotFoundException
 import ca.usherbrooke.degel.helpers.CalendarHelper
+import ca.usherbrooke.degel.helpers.NotificationBridge
+import ca.usherbrooke.degel.models.CalendarDiff
 import ca.usherbrooke.degel.services.CalendarService
 import ca.usherbrooke.degel.services.UserService
 import mu.KotlinLogging
+import org.springframework.context.MessageSource
 import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.stereotype.Component
 import java.util.*
@@ -13,7 +17,9 @@ private val logger = KotlinLogging.logger {}
 
 @Component
 class CalendarTask(private val userService: UserService,
-                   private val calendarService: CalendarService) {
+                   private val calendarService: CalendarService,
+                   private val notificationBridge: NotificationBridge,
+                   private val messageSource: MessageSource) {
     @Scheduled(fixedDelayString = "\${app.calendar.refresh-delay}")
     fun updateCalendars() {
         logger.info("Updating calendars for all users")
@@ -30,15 +36,17 @@ class CalendarTask(private val userService: UserService,
                     continue
                 }
 
-                val diff = CalendarHelper.diff(calendar, storedCalendar)
+                val calendarDiff = CalendarHelper.diff(calendar, storedCalendar)
+                val notifications = CalendarHelper.diffToNotifications(userId, calendarDiff, messageSource)
 
-                // TODO: Add notifications
+                for (notification in notifications) {
+                    notificationBridge.sendCalendarNotification(notification)
+                }
 
                 calendarService.updateStoredCalendar(userId, calendar, Date())
             } catch (e: Exception) {
                 logger.warn("Unable to update calendar for user $userId")
             }
-
         }
     }
 }

@@ -6,6 +6,8 @@ spring:
     password: password
 
 app:
+  integration:
+    notifyus: false
   location: http://localhost:8080
   notification:
     notifyus:

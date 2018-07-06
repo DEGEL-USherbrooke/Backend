@@ -2,8 +2,8 @@ package ca.usherbrooke.degel.controllers
 
 import ca.usherbrooke.degel.config.Constants
 import ca.usherbrooke.degel.config.Permissions
-import ca.usherbrooke.degel.exceptions.FailedRegisterNotificationTypeException
-import ca.usherbrooke.degel.exceptions.FailedSendNotificationException
+import ca.usherbrooke.degel.exceptions.FailedRegisterNUNotificationTypeException
+import ca.usherbrooke.degel.exceptions.FailedSendNUNotificationException
 import ca.usherbrooke.degel.models.notification.notifyus.NUNotification
 import ca.usherbrooke.degel.models.notification.notifyus.NUNotificationType
 import ca.usherbrooke.degel.services.IntegrationService
@@ -21,11 +21,11 @@ class IntegrationController(val service : IntegrationService) {
 
     @PreAuthorize(Permissions.HAS_ADMIN_ROLE)
     @PostMapping("/notification/notifyus/register")
-    @Throws(FailedRegisterNotificationTypeException::class)
+    @Throws(FailedRegisterNUNotificationTypeException::class)
     fun registerNotifyUsNotification(@RequestBody notificationType: NUNotificationType) = service.registerNotifyUsNotificationType(notificationType)
 
     @PreAuthorize(Permissions.HAS_ADMIN_ROLE)
     @PostMapping("/nuNotification/notifyus/send")
-    @Throws(FailedSendNotificationException::class)
+    @Throws(FailedSendNUNotificationException::class)
     fun sendNotifyUsNotification(@RequestBody nuNotification: NUNotification) = service.sendNotifyUsNotification(nuNotification)
 }
