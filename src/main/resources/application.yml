@@ -26,4 +26,4 @@ app:
   notification:
     expo-server: https://exp.host/--/api/v2/push/send
     notifyus:
-      service: http://s6iprojet01.gel.usherbrooke.ca
+      server: http://s6iprojet01.gel.usherbrooke.ca

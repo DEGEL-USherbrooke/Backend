@@ -4,8 +4,8 @@ import ca.usherbrooke.degel.config.Constants
 import ca.usherbrooke.degel.config.Permissions
 import ca.usherbrooke.degel.exceptions.FailedRegisterNotificationTypeException
 import ca.usherbrooke.degel.exceptions.FailedSendNotificationException
-import ca.usherbrooke.degel.models.NotifyUs.Notification
-import ca.usherbrooke.degel.models.NotifyUs.NotificationType
+import ca.usherbrooke.degel.models.notification.notifyus.NUNotification
+import ca.usherbrooke.degel.models.notification.notifyus.NUNotificationType
 import ca.usherbrooke.degel.services.IntegrationService
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.web.bind.annotation.PostMapping
@@ -22,10 +22,10 @@ class IntegrationController(val service : IntegrationService) {
     @PreAuthorize(Permissions.HAS_ADMIN_ROLE)
     @PostMapping("/notification/notifyus/register")
     @Throws(FailedRegisterNotificationTypeException::class)
-    fun registerNotifyUsNotification(@RequestBody notificationType: NotificationType) = service.registerNotifyUsNotificationType(notificationType)
+    fun registerNotifyUsNotification(@RequestBody notificationType: NUNotificationType) = service.registerNotifyUsNotificationType(notificationType)
 
     @PreAuthorize(Permissions.HAS_ADMIN_ROLE)
-    @PostMapping("/notification/notifyus/send")
+    @PostMapping("/nuNotification/notifyus/send")
     @Throws(FailedSendNotificationException::class)
-    fun sendNotifyUsNotification(@RequestBody notification: Notification) = service.sendNotifyUsNotification(notification)
+    fun sendNotifyUsNotification(@RequestBody nuNotification: NUNotification) = service.sendNotifyUsNotification(nuNotification)
 }
