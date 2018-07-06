@@ -14,3 +14,7 @@ app:
       refresh-delay: 1000
   notification:
       expo-server: https://expo.ca
+      notifyus:
+        server: http://s6iprojet01.gel.usherbrooke.ca
+        token: thisisaverygoodtoken
+        calendar-notification: thisisaverygoodnotification
