@@ -1,9 +1,9 @@
 package ca.usherbrooke.degel.services
 
-import ca.usherbrooke.degel.clients.ExpoNotificationClient
-import ca.usherbrooke.degel.entities.NotificationEntity
-import ca.usherbrooke.degel.models.Notification
-import ca.usherbrooke.degel.repositories.NotificationRepository
+import ca.usherbrooke.degel.clients.ExpoClient
+import ca.usherbrooke.degel.entities.NotificationTokenEntity
+import ca.usherbrooke.degel.models.notification.NotificationToken
+import ca.usherbrooke.degel.repositories.NotificationTokenRepository
 import ca.usherbrooke.degel.repositories.UserRepository
 import io.mockk.every
 import io.mockk.mockk
@@ -18,19 +18,19 @@ import java.util.*
 class NotificationServiceTests {
     companion object {
         val USER_ID = UUID.randomUUID()
-        val EXPO_TOKEN = Notification("Token")
-        val EXPO_TOKEN1 = Notification("Token1")
-        val NOTIFICATION = Notification("Token")
+        val EXPO_TOKEN = NotificationToken("Token")
+        val EXPO_TOKEN1 = NotificationToken("Token1")
+        val NOTIFICATION = NotificationToken("Token")
     }
 
-    private val notificationRepositoryMock = mockk<NotificationRepository>()
+    private val notificationRepositoryMock = mockk<NotificationTokenRepository>()
     private val userRepositoryMock = mockk<UserRepository>()
-    private val expoClientMock = mockk<ExpoNotificationClient>()
+    private val expoClientMock = mockk<ExpoClient>()
     private val notificationService = NotificationServiceImpl(notificationRepositoryMock, userRepositoryMock, expoClientMock)
 
     @Test
     fun `when new token add token`() {
-        val entity = slot<NotificationEntity>()
+        val entity = slot<NotificationTokenEntity>()
 
         every { notificationRepositoryMock.findByExpoToken(any()) } returns null
         every { notificationRepositoryMock.save(capture(entity)) } answers { entity.captured }
@@ -42,16 +42,16 @@ class NotificationServiceTests {
 
     @Test
     fun `when duplicate token delete old token and then add new token`() {
-        val entityOldToken = slot<NotificationEntity>()
-        val entityNewToken = slot<NotificationEntity>()
+        val entityOldToken = slot<NotificationTokenEntity>()
+        val entityNewToken = slot<NotificationTokenEntity>()
 
-        every { notificationRepositoryMock.findByExpoToken(any()) } returns NotificationEntity(USER_ID, EXPO_TOKEN1.expoToken)
+        every { notificationRepositoryMock.findByExpoToken(any()) } returns NotificationTokenEntity(USER_ID, EXPO_TOKEN1.expoToken)
         every { notificationRepositoryMock.delete(capture(entityOldToken)) } returns Unit
         every { notificationRepositoryMock.save(capture(entityNewToken)) } answers { entityNewToken.captured }
 
         val notificationToken = notificationService.notificationRegister(USER_ID, EXPO_TOKEN)
 
         assertEquals(NOTIFICATION, notificationToken)
-        assertEquals(entityOldToken.captured, NotificationEntity(USER_ID, EXPO_TOKEN1.expoToken))
+        assertEquals(entityOldToken.captured, NotificationTokenEntity(USER_ID, EXPO_TOKEN1.expoToken))
     }
 }

@@ -1,60 +1,75 @@
 package ca.usherbrooke.degel.services
 
-import ca.usherbrooke.degel.clients.ExpoNotificationClient
-import ca.usherbrooke.degel.entities.NotificationEntity
-import ca.usherbrooke.degel.models.ExpoNotification
-import ca.usherbrooke.degel.models.Notification
-import ca.usherbrooke.degel.models.NotificationContent
-import ca.usherbrooke.degel.repositories.NotificationRepository
+import ca.usherbrooke.degel.clients.ExpoClient
+import ca.usherbrooke.degel.entities.NotificationTokenEntity
+import ca.usherbrooke.degel.exceptions.FailedSendNUNotificationException
+import ca.usherbrooke.degel.models.notification.ExpoNotification
+import ca.usherbrooke.degel.models.notification.NotificationToken
+import ca.usherbrooke.degel.models.notification.Notification
+import ca.usherbrooke.degel.repositories.NotificationTokenRepository
 import ca.usherbrooke.degel.repositories.UserRepository
+import mu.KLogging
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.util.*
 
 interface NotificationService {
-    fun notificationRegister(id: UUID, tokenExpo: Notification): Notification
-    fun sendNotification(notificationContent: NotificationContent)
+    fun notificationRegister(id: UUID, tokenExpo: NotificationToken): NotificationToken
+    fun sendNotification(notification: Notification)
 }
 
 @Service
-class NotificationServiceImpl(private val notificationRepository: NotificationRepository,
+class NotificationServiceImpl(private val notificationTokenRepository: NotificationTokenRepository,
                               private val userRepository: UserRepository,
-                              private val expoNotificationClient: ExpoNotificationClient) : NotificationService {
+                              private val expoClient: ExpoClient) : NotificationService {
+    companion object: KLogging()
+
     @Transactional
-    override fun sendNotification(notificationContent: NotificationContent) {
-        val user = userRepository.findByCip(notificationContent.cip)
+    override fun sendNotification(notification: Notification) {
+        // Find the corresponding user
+        var userId = notification.userId
 
-        if (user != null) {
-            val notificationTokens = notificationRepository.findByUserId(user.id!!)
+        if (userId == null && notification.cip != null) {
+            val user = userRepository.findByCip(notification.cip)
+            userId = user?.id
+        }
 
-            if (notificationTokens != null) {
-                for (notificationToken: NotificationEntity in notificationTokens) {
-                    val expoNotification =  ExpoNotification(notificationToken.expoToken, notificationContent.title, notificationContent.description)
-                    expoNotificationClient.sendNotification(expoNotification)
-                }
+        // If cannot find it, do nothing (we don't know the user)
+        if (userId == null) {
+            logger.error("Cannot send notification. Unknown user: ${notification.cip}.")
+            return
+        }
+
+        // Send notification to all devices
+        val notificationTokens = notificationTokenRepository.findByUserId(userId)
+
+        if (notificationTokens != null) {
+            for (notificationToken: NotificationTokenEntity in notificationTokens) {
+                val expoNotification = ExpoNotification(notificationToken.expoToken, notification.title, notification.description)
+                expoClient.sendNotification(expoNotification)
             }
         }
     }
 
-    override fun notificationRegister(id: UUID, tokenExpo: Notification): Notification {
-        val oldTokenExpo = notificationRepository.findByExpoToken(tokenExpo.expoToken)
+    override fun notificationRegister(id: UUID, tokenExpo: NotificationToken): NotificationToken {
+        val oldTokenExpo = notificationTokenRepository.findByExpoToken(tokenExpo.expoToken)
 
         if (oldTokenExpo != null) {
             deleteOldNotificationEntity(oldTokenExpo)
         }
 
-        val notificationEntity = NotificationEntity.fromModel(id, Notification(tokenExpo.expoToken))
+        val notificationEntity = NotificationTokenEntity.fromModel(id, NotificationToken(tokenExpo.expoToken))
 
         return addNewNotificationEntity(notificationEntity)
     }
 
     @Transactional
-    fun deleteOldNotificationEntity(notificationEntity: NotificationEntity) {
-        notificationRepository.delete(notificationEntity)
+    fun deleteOldNotificationEntity(notificationTokenEntity: NotificationTokenEntity) {
+        notificationTokenRepository.delete(notificationTokenEntity)
     }
 
     @Transactional
-    fun addNewNotificationEntity(notificationEntity: NotificationEntity): Notification {
-        return notificationRepository.save(notificationEntity).toModel()
+    fun addNewNotificationEntity(notificationTokenEntity: NotificationTokenEntity): NotificationToken {
+        return notificationTokenRepository.save(notificationTokenEntity).toModel()
     }
 }

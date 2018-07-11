@@ -3,6 +3,9 @@ package ca.usherbrooke.degel.helpers
 import biweekly.ICalendar
 import biweekly.component.VEvent
 import ca.usherbrooke.degel.models.CalendarDiff
+import ca.usherbrooke.degel.models.notification.Notification
+import org.springframework.context.MessageSource
+import java.util.*
 
 object CalendarHelper {
     fun diff(calendar: ICalendar, storedCalendar: ICalendar) : CalendarDiff {
@@ -55,5 +58,50 @@ object CalendarHelper {
             return false
 
         return true
+    }
+
+    fun diffToNotifications(userId: UUID, calendarDiff: CalendarDiff, messageSource: MessageSource): List<Notification> {
+        val notifications = mutableListOf<Notification>()
+
+        // New events
+        for (addedEvent: VEvent in calendarDiff.addedEvents) {
+            notifications.add(Notification(
+                    null,
+                    userId,
+                    messageSource.getMessage("calendar.event.added.title", null, Locale.FRENCH),
+                    messageSource.getMessage("calendar.event.added.description",
+                            arrayOf(addedEvent.summary?.value ?: "",
+                                    addedEvent.location?.value ?: "",
+                                    addedEvent.dateStart?.value ?: ""),
+                            Locale.FRENCH)))
+        }
+
+        // Removed events
+        for (removedEvent: VEvent in calendarDiff.removedEvents) {
+            notifications.add(Notification(
+                    null,
+                    userId,
+                    messageSource.getMessage("calendar.event.removed.title", null, Locale.FRENCH),
+                    messageSource.getMessage("calendar.event.removed.description",
+                            arrayOf(removedEvent.summary?.value ?: "",
+                                    removedEvent.location?.value ?: "",
+                                    removedEvent.dateStart?.value ?: ""),
+                            Locale.FRENCH)))
+        }
+
+        // Changed events
+        for (modifiedEvent: VEvent in calendarDiff.modifiedEvents) {
+            notifications.add(Notification(
+                    null,
+                    userId,
+                    messageSource.getMessage("calendar.event.modified.title", null, Locale.FRENCH),
+                    messageSource.getMessage("calendar.event.modified.description",
+                            arrayOf(modifiedEvent.summary?.value ?: "",
+                                    modifiedEvent.location?.value ?: "",
+                                    modifiedEvent.dateStart?.value ?: ""),
+                            Locale.FRENCH)))
+        }
+
+        return notifications
     }
 }

@@ -6,16 +6,16 @@ import ca.usherbrooke.degel.config.Permissions
 import ca.usherbrooke.degel.exceptions.DegelException
 import ca.usherbrooke.degel.models.Value
 import ca.usherbrooke.degel.services.CalendarService
-import mu.KotlinLogging
+import mu.KLogging
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.web.bind.annotation.*
 import java.util.*
 
-private val logger = KotlinLogging.logger {}
-
 @RestController
 @RequestMapping(API)
 class CalendarController(val calendarService: CalendarService) {
+    companion object: KLogging()
+
     @PreAuthorize("${Permissions.USER_OWN_RESSOURCE} or ${Permissions.HAS_ADMIN_ROLE}")
     @GetMapping("/user/{id}/calendar")
     @Throws(DegelException::class)

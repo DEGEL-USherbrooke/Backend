@@ -10,8 +10,5 @@ object Permissions {
 
     // Trusted client
     const val HAS_TRUSTED_CLIENT_ROLE: String = "hasRole('TRUSTED_CLIENT')"
-
-    // Trusted Notification Provider
-    const val TRUSTED_NOTIFICATIONS_PROVIDER: String = "($HAS_TRUSTED_CLIENT_ROLE and #oauth2.hasScope('push_notification'))" //
-
+    const val TRUSTED_NOTIFICATIONS_PROVIDER: String = "($HAS_TRUSTED_CLIENT_ROLE and #oauth2.hasScope('push_notification'))"
 }

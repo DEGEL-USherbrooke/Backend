@@ -6,6 +6,8 @@ spring:
      # - org.springframework.boot.autoconfigure.orm.jpa.HibernateJpaAutoConfiguration
 
 app:
+  integration:
+    notifyus: false
   location: http://localhost:9999
   security:
       cas-server: https://toto.ca
@@ -14,3 +16,7 @@ app:
       refresh-delay: 1000
   notification:
       expo-server: https://expo.ca
+      notifyus:
+        server: http://s6iprojet01.gel.usherbrooke.ca
+        token: thisisaverygoodtoken
+        calendar-notification: thisisaverygoodnotification
