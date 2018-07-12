@@ -28,7 +28,10 @@ class ExceptionProcessor {
     @ExceptionHandler(ClientSideException::class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ResponseBody
-    fun clientSideException(e: ClientSideException) = RestException(e.error, e.message.orEmpty())
+    fun clientSideException(e: ClientSideException) : RestException {
+        logger.error("Client side error: ${e.message}")
+        return RestException(e.error, e.message.orEmpty())
+    }
 
     @ExceptionHandler(ServerSideException::class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)

@@ -27,6 +27,7 @@ class CalendarController(val calendarService: CalendarService) {
     @PreAuthorize("${Permissions.USER_OWN_RESSOURCE} or ${Permissions.HAS_ADMIN_ROLE}")
     @PostMapping("/user/{id}/calendar/key")
     fun setCalendarKey(@PathVariable id: UUID, @RequestBody key: Value<String>) : Value<String> {
+        logger.info("New calendar key for user $id")
         return calendarService.upsertCalendarKey(id, key.value)
     }
 }
