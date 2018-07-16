@@ -2,12 +2,15 @@ package ca.usherbrooke.degel.helpers
 
 import biweekly.ICalendar
 import biweekly.component.VEvent
+import ca.usherbrooke.degel.helpers.criterias.NotificationCriteria
 import ca.usherbrooke.degel.models.CalendarDiff
 import ca.usherbrooke.degel.models.notification.Notification
 import org.springframework.context.MessageSource
 import java.util.*
 
 object CalendarHelper {
+    private val notificationCriteria = NotificationCriteria()
+
     fun diff(calendar: ICalendar, storedCalendar: ICalendar) : CalendarDiff {
         // Copy old events
         val storedEvents = storedCalendar.events.toMutableList()
@@ -64,7 +67,8 @@ object CalendarHelper {
         val notifications = mutableListOf<Notification>()
 
         // New events
-        for (addedEvent: VEvent in calendarDiff.addedEvents) {
+        val addedEvents = notificationCriteria.apply(calendarDiff.addedEvents)
+        for (addedEvent: VEvent in addedEvents) {
             notifications.add(Notification(
                     null,
                     userId,
@@ -77,7 +81,8 @@ object CalendarHelper {
         }
 
         // Removed events
-        for (removedEvent: VEvent in calendarDiff.removedEvents) {
+        val removedEvents = notificationCriteria.apply(calendarDiff.removedEvents)
+        for (removedEvent: VEvent in removedEvents) {
             notifications.add(Notification(
                     null,
                     userId,
@@ -90,7 +95,8 @@ object CalendarHelper {
         }
 
         // Changed events
-        for (modifiedEvent: VEvent in calendarDiff.modifiedEvents) {
+        val modifiedEvents = notificationCriteria.apply(calendarDiff.modifiedEvents)
+        for (modifiedEvent: VEvent in modifiedEvents) {
             notifications.add(Notification(
                     null,
                     userId,
