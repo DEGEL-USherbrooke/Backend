@@ -17,7 +17,7 @@ class CalendarController(val calendarService: CalendarService) {
     companion object: KLogging()
 
     @PreAuthorize("${Permissions.USER_OWN_RESSOURCE} or ${Permissions.HAS_ADMIN_ROLE}")
-    @GetMapping("/user/{id}/calendar")
+    @GetMapping(value = ["/user/{id}/calendar"], produces = ["application/json;charset=UTF-8"])
     @Throws(DegelException::class)
     fun getCalendar(@PathVariable id: UUID) : String {
         logger.info("User $id requests his calendar")

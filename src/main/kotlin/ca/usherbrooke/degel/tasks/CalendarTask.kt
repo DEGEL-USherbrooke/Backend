@@ -1,10 +1,7 @@
 package ca.usherbrooke.degel.tasks
 
-import biweekly.component.VEvent
-import ca.usherbrooke.degel.exceptions.CalendarKeyNotFoundException
 import ca.usherbrooke.degel.helpers.CalendarHelper
 import ca.usherbrooke.degel.helpers.NotificationBridge
-import ca.usherbrooke.degel.models.CalendarDiff
 import ca.usherbrooke.degel.services.CalendarService
 import ca.usherbrooke.degel.services.UserService
 import mu.KotlinLogging
