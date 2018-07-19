@@ -17,6 +17,12 @@ spring:
     okhttp:
       enabled: true
 
+logging:
+  level:
+    org.springframework.context.support.ResourceBundleMessageSource: ERROR
+    org.springframework.security.oauth2.provider.token.store.JdbcTokenStore: WARN
+    ca.usherbrooke.degel.controllers.CalendarController: WARN
+
 app:
   security:
     cas-server: https://cas.usherbrooke.ca
