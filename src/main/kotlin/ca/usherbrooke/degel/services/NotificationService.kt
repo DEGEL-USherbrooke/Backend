@@ -16,11 +16,13 @@ import java.util.*
 interface NotificationService {
     fun notificationRegister(id: UUID, tokenExpo: NotificationToken): NotificationToken
     fun sendNotification(notification: Notification)
+    fun sendNotificationAll(notification: Notification)
 }
 
 @Service
 class NotificationServiceImpl(private val notificationTokenRepository: NotificationTokenRepository,
                               private val userRepository: UserRepository,
+                              private val settingsService: SettingsService,
                               private val expoClient: ExpoClient) : NotificationService {
     companion object: KLogging()
 
@@ -40,15 +42,24 @@ class NotificationServiceImpl(private val notificationTokenRepository: Notificat
             return
         }
 
+        // Check if user doesn't want notifications
+        val settings = settingsService.getSettings(userId)
+        if (!settings.notifications.mobile)
+            return
+
         // Send notification to all devices
         val notificationTokens = notificationTokenRepository.findByUserId(userId)
 
-        if (notificationTokens != null) {
-            for (notificationToken: NotificationTokenEntity in notificationTokens) {
-                val expoNotification = ExpoNotification(notificationToken.expoToken, notification.title, notification.description)
-                expoClient.sendNotification(expoNotification)
-            }
+        notificationTokens?.let {
+            sendNotificationToTokens(notification, it)
         }
+    }
+
+    override fun sendNotificationAll(notification: Notification) {
+        logger.info { "Sending notification to all users" }
+
+        val notificationTokens = notificationTokenRepository.findAll()
+        sendNotificationToTokens(notification, notificationTokens)
     }
 
     override fun notificationRegister(id: UUID, tokenExpo: NotificationToken): NotificationToken {
@@ -71,5 +82,17 @@ class NotificationServiceImpl(private val notificationTokenRepository: Notificat
     @Transactional
     fun addNewNotificationEntity(notificationTokenEntity: NotificationTokenEntity): NotificationToken {
         return notificationTokenRepository.save(notificationTokenEntity).toModel()
+    }
+
+    private fun sendNotificationToTokens(notification: Notification, notificationTokens: List<NotificationTokenEntity>) {
+        for (notificationToken in notificationTokens) {
+            val expoNotification = ExpoNotification(notificationToken.expoToken, notification.title, notification.description)
+
+            try {
+                expoClient.sendNotification(expoNotification)
+            } catch (e: Exception) {
+                logger.error { "Failed to send notification to devive ${expoNotification.to}" }
+            }
+        }
     }
 }

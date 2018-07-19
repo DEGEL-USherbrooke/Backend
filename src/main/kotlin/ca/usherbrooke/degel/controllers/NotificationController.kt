@@ -17,7 +17,11 @@ class NotificationController(val service : NotificationService) {
     @PostMapping("/user/{id}/notification/register")
     fun notificationRegister(@PathVariable id: UUID, @RequestBody body: NotificationToken) = service.notificationRegister(id, body)
 
-    @PreAuthorize(Permissions.TRUSTED_NOTIFICATIONS_PROVIDER)
+    @PreAuthorize("${Permissions.TRUSTED_NOTIFICATIONS_PROVIDER} or ${Permissions.HAS_ADMIN_ROLE}")
     @PostMapping("/notification/deliver")
     fun deliverNotification(@RequestBody notification: Notification) = service.sendNotification(notification)
+
+    @PreAuthorize(Permissions.HAS_ADMIN_ROLE)
+    @PostMapping("/notification/deliver/all")
+    fun deliverNotificationAll(@RequestBody notification: Notification) = service.sendNotification(notification)
 }
