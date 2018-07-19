@@ -26,7 +26,11 @@ class NotificationServiceTests {
     private val notificationRepositoryMock = mockk<NotificationTokenRepository>()
     private val userRepositoryMock = mockk<UserRepository>()
     private val expoClientMock = mockk<ExpoClient>()
-    private val notificationService = NotificationServiceImpl(notificationRepositoryMock, userRepositoryMock, expoClientMock)
+    private val settingsService = mockk<SettingsService>()
+    private val notificationService = NotificationServiceImpl(notificationRepositoryMock,
+            userRepositoryMock,
+            settingsService,
+            expoClientMock)
 
     @Test
     fun `when new token add token`() {
