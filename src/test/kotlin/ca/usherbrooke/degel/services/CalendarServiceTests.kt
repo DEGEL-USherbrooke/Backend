@@ -28,8 +28,9 @@ private class FeignRandomException : FeignException("What is going on here")
 @RunWith(MockitoJUnitRunner::class)
 class CalendarServiceTests {
     companion object {
-        const val CALENDAR_KEY = "may the force be with you"
-        const val ANOTHER_CALENDAR_KEY = "luke you are my son"
+        const val CALENDAR_KEY = "bWF5IHRoZSBmb3JjZSBiZSB3aXRoIHlvdQ=="
+        const val ANOTHER_CALENDAR_KEY = "bHVrZSB5b3UgYXJlIG15IHNvbg=="
+        const val BAD_CALENDAR_KEY = "may the fourth be with you"
         val USER_ID = UUID.randomUUID()
         val CALENDAR_DATA = IOUtils.toString(this::class.java.getResourceAsStream("/calendars/icalendar.ics"), StandardCharsets.UTF_8)
         val CALENDAR = Biweekly.parse(CALENDAR_DATA).first()
@@ -136,5 +137,10 @@ class CalendarServiceTests {
         verify { calendarRepositoryMock.setCalendar(any(), any(), any()) }
         assertEquals(CALENDAR, calendar.captured)
         assertEquals(USER_ID, userId.captured)
+    }
+
+    @Test(expected = CalendarKeyInvalidException::class)
+    fun `cannot insert invalid calendar key`() {
+        calendarService.upsertCalendarKey(USER_ID, BAD_CALENDAR_KEY)
     }
 }

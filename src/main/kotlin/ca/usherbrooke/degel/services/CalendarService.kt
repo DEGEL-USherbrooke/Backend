@@ -34,7 +34,7 @@ class CalendarServiceImpl(private val calendarRepository: CalendarRepository,
     override fun getCalendar(userId: UUID) : ICalendar {
         val calendarEntity = calendarRepository.findByUserId(userId)
 
-        if (calendarEntity == null || calendarEntity.key.isEmpty())
+        if (calendarEntity == null || calendarEntity.key.isBlank())
             throw CalendarKeyNotFoundException(userId)
 
         try {
@@ -63,6 +63,10 @@ class CalendarServiceImpl(private val calendarRepository: CalendarRepository,
 
     @Transactional
     override fun upsertCalendarKey(userId: UUID, key: String) : Value<String> {
+        // Avoid some bad keys
+        if(key.isBlank() || key.contains(" "))
+            throw CalendarKeyInvalidException(userId)
+
         var calendarEntity = calendarRepository.findByUserId(userId)
 
         if(calendarEntity == null)

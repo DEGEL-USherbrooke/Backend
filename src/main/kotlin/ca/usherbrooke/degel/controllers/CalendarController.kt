@@ -20,7 +20,7 @@ class CalendarController(val calendarService: CalendarService) {
     @GetMapping("/user/{id}/calendar")
     @Throws(DegelException::class)
     fun getCalendar(@PathVariable id: UUID) : String {
-        logger.info("User $id requests his calendar")
+        logger.debug("User $id requests his calendar")
         return Biweekly.writeJson(calendarService.getCalendar(id)).go()
     }
 
