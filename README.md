@@ -1,8 +1,12 @@
 # Degel Backend
 This is the backend part of the DEGEL app. It was created for the semester project of E2018 at Sherbrooke University.
 
-## Prepation
-- Create `application-local.yml` with the following content:
+#### Contributors
+- [Sytten](https://github.com/Sytten)
+- [larochelle000](https://github.com/larochelle000)
+
+## Preparation
+- Modify `application-local.yml` with the following content:
 
 ```yaml
 spring:
