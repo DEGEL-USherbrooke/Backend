@@ -1,4 +1,5 @@
 # Degel Backend
+This is the backend part of the DEGEL app. It was created for the semester project of E2018 at Sherbrooke University.
 
 ## Prepation
 - Create `application-local.yml` with the following content:
@@ -12,7 +13,13 @@ spring:
     password: password
 
 app:
+  integration:
+    notifyus: false
   location: http://localhost:8080
+  notification:
+    notifyus:
+      token: <TOKEN GIVEN BY THE NOTIFYUS TEAM>
+      calendar-notification: <NAME OF THE NOTIFICATION>
 ```
 
 - (Only for docker) Create a `.env` file with the following content:
