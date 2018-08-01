@@ -1,9 +1,20 @@
 # Degel Backend
-This is the backend part of the DEGEL app. It was created for the semester project of E2018 at Sherbrooke University.
+This is the backend part of the [DEGEL mobile application](https://github.com/DEGEL-USherbrooke/Mobile). This project was created during the E2018 semester by and for students of [Sherbrooke University](https://www.usherbrooke.ca/).
 
-#### Contributors
-- [Sytten](https://github.com/Sytten)
-- [larochelle000](https://github.com/larochelle000)
+### Features
+- OAuth2 on top of CAS
+- Pulling of calendar to verify changes
+- Sends notifications to registered users
+- Handle user settings
+
+### Contributors
+- [Philippe Girard](https://github.com/philippegirard)
+- [Xavier Bolduc-Meilleur](https://github.com/Xavbm)
+- [Donavan Martin](https://github.com/DonavanMartin)
+- [Émile Fugulin](https://github.com/Sytten)
+- [Julien Larochelle](https://github.com/larochelle000)
+- [Mathieu Dostie](https://github.com/dostiemat)
+- [Théo Hipault](https://github.com/Parazar)
 
 ## Preparation
 - Modify `application-local.yml` with the following content:
