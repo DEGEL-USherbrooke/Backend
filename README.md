@@ -53,9 +53,9 @@ By default, no OAuth client is defined in the `oauth_client_details` table, you 
 
 - For normal users:
 
-```
+```sql
 INSERT INTO oauth_client_details VALUES
-  (<INSERT CLIENT ID HERE>,
+  (--INSERT CLIENT ID HERE,
    NULL,
    '{noop}',
    'user_read,user_write',
@@ -70,11 +70,11 @@ INSERT INTO oauth_client_details VALUES
 
 - For trusted notification partners:
 
-```
+```sql
 INSERT INTO oauth_client_details VALUES
-  (<INSERT CLIENT ID HERE>,
+  (--INSERT CLIENT ID HERE,
    NULL,
-   <INSERT CLIENT SECRET HERE (WITH CRYPTO METHOD)>,
+   --INSERT CLIENT SECRET HERE (WITH CRYPTO METHOD),
    'push_notification',
    'client_credentials',
    NULL,
