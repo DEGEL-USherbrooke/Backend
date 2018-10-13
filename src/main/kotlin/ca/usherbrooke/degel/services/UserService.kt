@@ -37,7 +37,7 @@ class UserServiceImpl(private val userRepository: UserRepository) : UserService,
 
     @Transactional
     override fun loadUserByUsername(username: String): UserDetails {
-        val userEntity = upsertUserEntity(User(null, username, true))
+        val userEntity = upsertUserEntity(User(null, username, true, false))
 
         // The toSet is necessary to detach the set from Hibernate persistence cache
         return UserDetailsImpl(userEntity.id!!, userEntity.cip, userEntity.authorities.toSet(), userEntity.enabled)

@@ -28,7 +28,8 @@ private val logger = KotlinLogging.logger {}
 
 @Service
 class CalendarServiceImpl(private val calendarRepository: CalendarRepository,
-                          private val horariusClient: HorariusClient) : CalendarService {
+                          private val horariusClient: HorariusClient,
+                          private val userService: UserService) : CalendarService {
     @Transactional
     @Throws(DegelException::class)
     override fun getCalendar(userId: UUID) : ICalendar {
@@ -69,10 +70,14 @@ class CalendarServiceImpl(private val calendarRepository: CalendarRepository,
 
         var calendarEntity = calendarRepository.findByUserId(userId)
 
-        if(calendarEntity == null)
+        if(calendarEntity == null) {
             calendarEntity = CalendarEntity(userId, key)
-        else
-            calendarEntity.key = key
+        } else {
+            // Don't update key of testers
+            val user = userService.getUser(userId)
+            if(!user.tester)
+                calendarEntity.key = key
+        }
 
         return Value(calendarRepository.save(calendarEntity).key)
     }

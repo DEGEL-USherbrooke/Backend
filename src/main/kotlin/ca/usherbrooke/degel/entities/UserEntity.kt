@@ -11,6 +11,7 @@ import javax.persistence.*
 data class UserEntity(
         val cip: String,
         val enabled: Boolean,
+        val tester: Boolean,
         @ElementCollection(fetch = FetchType.EAGER)
         @CollectionTable(
                 name="authorities",
@@ -23,11 +24,12 @@ data class UserEntity(
     fun toModel(): User = User(
             this.id,
             this.cip,
-            this.enabled)
+            this.enabled,
+            this.tester)
 
     companion object {
         fun fromModel(user: User): UserEntity {
-            val userEntity = UserEntity(user.cip, user.enabled, setOf(SimpleGrantedAuthority("ROLE_USER")))
+            val userEntity = UserEntity(user.cip, user.enabled, user.tester, setOf(SimpleGrantedAuthority("ROLE_USER")))
             return userEntity
         }
     }
