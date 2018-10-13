@@ -7,6 +7,7 @@ import ca.usherbrooke.degel.entities.CalendarEntity
 import ca.usherbrooke.degel.exceptions.CalendarCouldNotBeFetchedException
 import ca.usherbrooke.degel.exceptions.CalendarKeyInvalidException
 import ca.usherbrooke.degel.exceptions.CalendarKeyNotFoundException
+import ca.usherbrooke.degel.models.User
 import ca.usherbrooke.degel.repositories.CalendarRepository
 import feign.FeignException
 import io.mockk.every
@@ -32,6 +33,7 @@ class CalendarServiceTests {
         const val ANOTHER_CALENDAR_KEY = "bHVrZSB5b3UgYXJlIG15IHNvbg=="
         const val BAD_CALENDAR_KEY = "may the fourth be with you"
         val USER_ID = UUID.randomUUID()
+        val USER_CIP = "fuge2701"
         val CALENDAR_DATA = IOUtils.toString(this::class.java.getResourceAsStream("/calendars/icalendar.ics"), StandardCharsets.UTF_8)
         val CALENDAR = Biweekly.parse(CALENDAR_DATA).first()
         val NOW = Date()
@@ -41,7 +43,9 @@ class CalendarServiceTests {
 
     val horariusClientMock = mockk<HorariusClient>()
 
-    val calendarService = CalendarServiceImpl(calendarRepositoryMock, horariusClientMock)
+    val userServiceMock = mockk<UserService>()
+
+    val calendarService = CalendarServiceImpl(calendarRepositoryMock, horariusClientMock, userServiceMock)
 
     @Test
     fun `if no calendar insert it`() {
@@ -64,12 +68,29 @@ class CalendarServiceTests {
         every { calendarRepositoryMock.findByUserId(any()) } returns CalendarEntity(USER_ID, CALENDAR_KEY)
                 .also { s -> s.id = UUID.randomUUID() }
         every { calendarRepositoryMock.save(capture(entity)) } answers { entity.captured }
+        every { userServiceMock.getUser(any()) } returns User(USER_ID, USER_CIP, true, false)
 
         calendarService.upsertCalendarKey(USER_ID, ANOTHER_CALENDAR_KEY)
 
         verify { calendarRepositoryMock.save(any<CalendarEntity>()) }
         assertNotNull(entity.captured.id)
         assertEquals(ANOTHER_CALENDAR_KEY, entity.captured.key)
+    }
+
+    @Test
+    fun `if calendar present and tester don't update the key`() {
+        val entity = slot<CalendarEntity>()
+
+        every { calendarRepositoryMock.findByUserId(any()) } returns CalendarEntity(USER_ID, CALENDAR_KEY)
+                .also { s -> s.id = UUID.randomUUID() }
+        every { calendarRepositoryMock.save(capture(entity)) } answers { entity.captured }
+        every { userServiceMock.getUser(any()) } returns User(USER_ID, USER_CIP, true, true)
+
+        calendarService.upsertCalendarKey(USER_ID, ANOTHER_CALENDAR_KEY)
+
+        verify { calendarRepositoryMock.save(any<CalendarEntity>()) }
+        assertNotNull(entity.captured.id)
+        assertEquals(CALENDAR_KEY, entity.captured.key)
     }
 
     @Test(expected = CalendarKeyNotFoundException::class)
