@@ -26,6 +26,7 @@ class FeedsServiceTests {
     companion object {
         val MAX_NEWS_ELEMENTS = 5
         val FEED = Feed(UUID.randomUUID(), "Feed name", "http://perdu.com")
+        val OTHER_FEED = Feed(UUID.randomUUID(), "Other name", "http://perdu2.com")
         val UPDATED_FEED = Feed(FEED.id, "Updated name", "http://perdu.com\"")
         val NEW_FEED = Feed(null, "New Feed", "Usherbrooke.ca")
         val USER_ID = UUID.randomUUID()
@@ -97,5 +98,32 @@ class FeedsServiceTests {
         assertEquals(news[0].publishedDate.toInstant(), Instant.ofEpochMilli(1541566800000))
     }
 
+    @Test
+    fun `get news for user without duplicates`() {
+        val response = ResponseEntity<Resource>(
+                InputStreamResource(this::class.java.getResourceAsStream("/feeds/law.xml")),
+                HttpStatus.OK
+        )
+        val otherResponse = ResponseEntity<Resource>(
+                InputStreamResource(this::class.java.getResourceAsStream("/feeds/law.xml")),
+                HttpStatus.OK
+        )
+        val feedEntity = FeedEntity.fromModel(FEED)
+        feedEntity.id = FEED.id
+        val otherFeedEntity = FeedEntity.fromModel(OTHER_FEED)
+        otherFeedEntity.id = OTHER_FEED.id
 
+        every { settingsServiceMock.getSettings(USER_ID) } returns USER_SETTINGS
+        every { feedsRepositoryMock.findAllById(setOf(FEED.id!!)) } returns listOf(feedEntity, otherFeedEntity)
+        every { feedsClientMock.getForEntity(FEED.url, Resource::class.java) } returns response
+        every { feedsClientMock.getForEntity(OTHER_FEED.url, Resource::class.java) } returns otherResponse
+
+        val news = feedsService.getNews(USER_ID)
+
+        assertEquals(news.size, MAX_NEWS_ELEMENTS)
+        assertEquals(news[0].publishedDate.toInstant(), Instant.ofEpochMilli(1541566800000))
+        assertEquals(1, news.count {
+            it.title == "Créer des ponts entre autochtones et allochtones une initiative à la fois"
+        })
+    }
 }

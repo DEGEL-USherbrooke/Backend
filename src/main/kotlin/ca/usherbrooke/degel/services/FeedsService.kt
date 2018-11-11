@@ -56,7 +56,9 @@ class FeedsServiceImpl(
                         it.publishedDate
                 )
             }
-        }.flatten().sortedByDescending {
+        }.flatten().distinctBy {
+            it.title
+        }.sortedByDescending {
             it.publishedDate
         }.take(maxNewsElements)
     }
