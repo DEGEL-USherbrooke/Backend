@@ -18,8 +18,8 @@ import java.util.*
 class SettingsServiceTests {
     companion object {
         val USER_ID = UUID.randomUUID()
-        val DEFAULT_USER_SETTINGS = Settings(NotificationsSettings(true))
-        val CUSTOM_USER_SETTINGS = Settings(NotificationsSettings(false))
+        val DEFAULT_USER_SETTINGS = Settings(NotificationsSettings(true), emptySet())
+        val CUSTOM_USER_SETTINGS = Settings(NotificationsSettings(false), emptySet())
     }
 
     val settingsRepositoryMock = mockk<SettingsRepository>()
