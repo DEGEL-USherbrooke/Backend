@@ -10,6 +10,7 @@ import org.springframework.web.client.RestTemplate
 import java.util.*
 import com.rometools.rome.io.SyndFeedInput
 import com.rometools.rome.io.XmlReader
+import mu.KLogging
 import org.apache.commons.lang.StringEscapeUtils
 import org.jsoup.Jsoup
 import org.jsoup.safety.Whitelist
@@ -28,9 +29,13 @@ interface FeedsService {
 class FeedsServiceImpl(
         private val feedsRepository: FeedsRepository,
         private val settingsService: SettingsService,
-        private val feedsClient: RestTemplate = RestTemplate(),
+        private val feedsClient: RestTemplate,
         @Value("\${app.feeds.max-news-elements}") val maxNewsElements: Int
 ) : FeedsService {
+    companion object: KLogging()
+
+    private val parser = SyndFeedInput()
+
     @Transactional
     override fun getFeeds(): List<Feed> {
         return feedsRepository.findAll().map { it -> it.toModel() }
@@ -41,21 +46,8 @@ class FeedsServiceImpl(
         val settings = settingsService.getSettings(userId)
         val feeds = feedsRepository.findAllById(settings.feeds)
 
-        val input = SyndFeedInput()
         return feeds.map {
-            val response = feedsClient.getForEntity(it.url, Resource::class.java)
-            val feed = input.build(XmlReader(response.body!!.inputStream))
-            val baseUrl = URL(it.url)
-            feed.entries.map {
-                val description = Jsoup.clean(it.description.value, Whitelist.none())
-                News(
-                        it.title,
-                        StringEscapeUtils.unescapeHtml(description),
-                        "${baseUrl.protocol}://${baseUrl.authority}${it.link}",
-                        it.enclosures.getOrNull(0)?.url ?: "",
-                        it.publishedDate
-                )
-            }
+            fetchFeedNews(it.url)
         }.flatten().distinctBy {
             it.title
         }.sortedByDescending {
@@ -68,5 +60,31 @@ class FeedsServiceImpl(
         val feedEntity  = FeedEntity.fromModel(feed)
         feedEntity.id = feed.id?.let { feedsRepository.findById(it).orElse(null)?.id }
         return feedsRepository.save(feedEntity).toModel()
+    }
+
+    private fun fetchFeedNews(url: String): List<News> {
+        try {
+            val response = feedsClient.getForEntity(url, Resource::class.java)
+            val feed = parser.build(XmlReader(response.body!!.inputStream))
+            val baseUrl = URL(url)
+
+            if (feed.entries.size == 0) {
+                logger.warn { "Feed $url didn't produce any news" }
+            }
+
+            return feed.entries.map {
+                val description = Jsoup.clean(it.description.value, Whitelist.none())
+                News(
+                        it.title,
+                        StringEscapeUtils.unescapeHtml(description),
+                        "${baseUrl.protocol}://${baseUrl.authority}${it.link}",
+                        it.enclosures.getOrNull(0)?.url ?: "",
+                        it.publishedDate
+                )
+            }
+        } catch (e: Exception) {
+            logger.error("Error occurred when fetching news from $url", e)
+            return emptyList()
+        }
     }
 }
