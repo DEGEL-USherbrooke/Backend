@@ -27,5 +27,5 @@ class SettingsServiceImpl(private val settingsRepository: SettingsRepository) : 
         return settingsRepository.save(settingsEntity).toModel()
     }
 
-    private fun createDefaultSettings() = Settings(NotificationsSettings(true))
+    private fun createDefaultSettings() = Settings(NotificationsSettings(true), emptySet())
 }

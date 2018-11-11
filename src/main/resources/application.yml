@@ -25,6 +25,8 @@ logging:
 app:
   security:
     cas-server: https://cas.usherbrooke.ca
+  feeds:
+    max-news-elements: 20
   calendar:
     horarius: https://www.gel.usherbrooke.ca/horarius
     refresh-delay: 300000 # 5min

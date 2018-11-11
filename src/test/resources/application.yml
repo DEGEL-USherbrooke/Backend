@@ -14,6 +14,8 @@ app:
   calendar:
       horarius: https://youarelost.ca
       refresh-delay: 1000
+  feeds:
+      max-news-elements: 5
   notification:
       expo-server: https://expo.ca
       notifyus:
