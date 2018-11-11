@@ -6,5 +6,5 @@ data class NotificationsSettings(val mobile: Boolean)
 
 data class Settings(
         val notifications: NotificationsSettings,
-        val feeds: Set<UUID>
+        val feeds: Set<UUID> = emptySet()
 )
