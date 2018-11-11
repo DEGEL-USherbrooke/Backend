@@ -28,6 +28,7 @@ interface FeedsService {
 class FeedsServiceImpl(
         private val feedsRepository: FeedsRepository,
         private val settingsService: SettingsService,
+        private val feedsClient: RestTemplate = RestTemplate(),
         @Value("\${app.feeds.max-news-elements}") val maxNewsElements: Int
 ) : FeedsService {
     @Transactional
@@ -40,10 +41,9 @@ class FeedsServiceImpl(
         val settings = settingsService.getSettings(userId)
         val feeds = feedsRepository.findAllById(settings.feeds)
 
-        val client = RestTemplate()
         val input = SyndFeedInput()
         return feeds.map {
-            val response = client.getForEntity(it.url, Resource::class.java)
+            val response = feedsClient.getForEntity(it.url, Resource::class.java)
             val feed = input.build(XmlReader(response.body!!.inputStream))
             val baseUrl = URL(it.url)
             feed.entries.map {
@@ -63,8 +63,8 @@ class FeedsServiceImpl(
 
     @Transactional
     override fun upsertFeed(feed: Feed): Feed {
-        val feed  = FeedEntity.fromModel(feed)
-        feed.id = feed.id?.let { feedsRepository.findById(it).orElse(null)?.id }
-        return feedsRepository.save(feed).toModel()
+        val feedEntity  = FeedEntity.fromModel(feed)
+        feedEntity.id = feed.id?.let { feedsRepository.findById(it).orElse(null)?.id }
+        return feedsRepository.save(feedEntity).toModel()
     }
 }
