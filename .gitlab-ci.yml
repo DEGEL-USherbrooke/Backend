@@ -20,6 +20,7 @@ build:
   stage: build
   script: 
     - echo "$SPRING_DEPLOY_PROFILE" > ./src/main/resources/application-deploy.yml
+    - echo "$LOGBACK_CONFIG" > ./src/main/resources/logback.xml
     - gradle --build-cache assemble
   cache:
     key: "$CI_COMMIT_REF_NAME"
