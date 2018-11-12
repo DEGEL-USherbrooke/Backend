@@ -96,6 +96,7 @@ class FeedsServiceTests {
 
         assertEquals(news.size, MAX_NEWS_ELEMENTS)
         assertEquals(news[0].publishedDate.toInstant(), Instant.ofEpochMilli(1541566800000))
+        assertEquals(news[0].link, "http://www.usherbrooke.ca/droit/accueil/nouvelles/nouvelles-details/article/38813/")
     }
 
     @Test

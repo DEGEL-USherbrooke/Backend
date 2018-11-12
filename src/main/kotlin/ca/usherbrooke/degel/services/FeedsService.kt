@@ -66,7 +66,6 @@ class FeedsServiceImpl(
         try {
             val response = feedsClient.getForEntity(url, Resource::class.java)
             val feed = parser.build(XmlReader(response.body!!.inputStream))
-            val baseUrl = URL(url)
 
             if (feed.entries.size == 0) {
                 logger.warn { "Feed $url didn't produce any news" }
@@ -77,7 +76,7 @@ class FeedsServiceImpl(
                 News(
                         it.title,
                         StringEscapeUtils.unescapeHtml(description),
-                        "${baseUrl.protocol}://${baseUrl.authority}${it.link}",
+                        buildLink(feed.link, it.link),
                         it.enclosures.getOrNull(0)?.url ?: "",
                         it.publishedDate
                 )
@@ -86,5 +85,16 @@ class FeedsServiceImpl(
             logger.error("Error occurred when fetching news from $url", e)
             return emptyList()
         }
+    }
+
+    private fun buildLink(baseLink: String, newsLink: String): String {
+        val baseUrl = URL(baseLink)
+        var path = newsLink
+        try {
+            path = URL(newsLink).path
+        } catch (e: Exception) {
+            logger.debug { "News link $newsLink is not a full URL, revert to path usage" }
+        }
+        return "${baseUrl.protocol}://${baseUrl.authority}$path"
     }
 }
